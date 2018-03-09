@@ -9,7 +9,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.0.0</Version>
+    <Version>0.0.1</Version>
     <PackageId>DNT</PackageId>
   </PropertyGroup>
   <ItemGroup>
