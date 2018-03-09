@@ -3,6 +3,20 @@
 
 **Experimental: Command and parameter names may change**
 
-## Commands
+## Package Commands
+
+### install-package
+
+### switch-to-projects (NuGetReferenceSwitcher)
+
+### switch-to-packages
 
 ### update-package
+
+## Project Commands
+
+### bump-version
+
+## Solution Commands
+
+### create-solution

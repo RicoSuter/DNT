@@ -7,7 +7,7 @@ using NConsole;
 
 namespace Dnt.Commands.Packages
 {
-    [Command(Name = "update-package", Description = "Updates the versions of the selected package refernces in the given projects.")]
+    [Command(Name = "update-package", Description = "Updates the versions of the selected package references in the given projects.")]
     public class UpdatePackageCommand : ProjectCommandBase
     {
         [Argument(Name = nameof(Package), IsRequired = true, Description = "The package(s) to update (allows * wildcards for selecting multiple packages).")]
