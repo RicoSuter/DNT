@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dnt": {
+      "commandName": "Project",
+      "commandLineArgs": "bump-version patch /path:C:\\Data\\Projects\\NSwag\\src"
+    }
+  }
+}
