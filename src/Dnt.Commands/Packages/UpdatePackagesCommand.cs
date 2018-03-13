@@ -10,10 +10,10 @@ namespace Dnt.Commands.Packages
     [Command(Name = "update-packages", Description = "Updates the versions of the selected package references in the given projects.")]
     public class UpdatePackagesCommand : ProjectCommandBase
     {
-        [Argument(Name = nameof(Package), IsRequired = true, Description = "The package(s) to update (allows * wildcards for selecting multiple packages).")]
+        [Argument(Position = 1, IsRequired = true, Description = "The package(s) to update (allows * wildcards for selecting multiple packages).")]
         public string Package { get; set; }
 
-        [Argument(Name = nameof(Version), IsRequired = false, Description = "The version to update to (wildcards * will be converted to a range ('1.*' => '[1 - 2)').")]
+        [Argument(Position = 2, IsRequired = false, Description = "The version to update to (wildcards * will be converted to a range ('1.*' => '[1 - 2)').")]
         public string Version { get; set; }
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
@@ -48,7 +48,7 @@ namespace Dnt.Commands.Packages
 
                     foreach (var package in packages)
                     {
-                        ExecuteCommand("dotnet add \"" + projectPath + "\" package " + package + (version != null ? " -v " + version : ""), host);
+                        ExecuteCommand("dotnet add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
                     }
                 }
                 catch (Exception e)

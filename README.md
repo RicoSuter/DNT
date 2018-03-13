@@ -20,13 +20,32 @@ This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitche
 **Command:**
 
 ```
-dnt update-packages /package:PackagesToUpdate [/version:TargetPackageVersion]
-
+dnt update-packages PackagesToUpdate [TargetPackageVersion]
 ```
 
 **Parameters:**
 
 - package: The package ID to update, also supports * wildcards
+
+**Samples:**
+
+Update the Newtonsoft.Json packages in the selected projects to version 10.0.1:
+
+```
+dnt update-packages Newtonsoft.Json 10.0.1
+```
+
+Update all packages in the selected projects to the latest version:
+
+```
+dnt update-packages *
+```
+
+Update all packages wich start with "MyCommonPackages." in the selected projects to version 2.1.0:
+
+```
+dnt update-packages MyCommonPackages.* 2.1.0
+```
 
 ## Project Commands
 
@@ -44,17 +63,17 @@ TBD
 
 **Samples:**
 
+Bump the minor version of all selected projects by 1:
+
 ```
 dnt bump-version minor
 ```
 
-Bumps the minor version of all selected projects by 1.
+Sets the patch version of all selected projects to 18:
 
 ```
 dnt bump-version patch /patch:18
 ```
-
-Sets the patch version of all selected projects to 18.
 
 ## Solution Commands
 
