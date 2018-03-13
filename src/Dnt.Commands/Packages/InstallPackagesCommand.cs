@@ -4,8 +4,8 @@ using NConsole;
 
 namespace Dnt.Commands.Packages
 {
-    [Command(Name = "install-package")]
-    public class InstallPackageCommand : ProjectCommandBase
+    [Command(Name = "install-packages")]
+    public class InstallPackagesCommand : ProjectCommandBase
     {
         [Argument(Name = "package", IsRequired = true)]
         public string Package { get; set; }

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.IO;
 using Microsoft.Build.Evaluation;
 
 namespace Dnt.Commands
@@ -12,7 +12,9 @@ namespace Dnt.Commands
 
         public static bool HasVersion(this Project project)
         {
-            return project.Properties.Any(i => i.Name == "Version" && !string.IsNullOrEmpty(i.UnevaluatedValue));
+            var data = File.ReadAllText(project.FullPath);
+            return data.Contains("<Version>");
+            //return project.Properties.Any(i => i.Name == "Version" && !string.IsNullOrEmpty(i.UnevaluatedValue));
         }
     }
 }

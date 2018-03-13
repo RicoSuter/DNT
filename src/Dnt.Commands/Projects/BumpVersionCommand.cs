@@ -13,8 +13,14 @@ namespace Dnt.Commands.Projects
         [Argument(Position = 1, Description = "The version part to update (major|minor|patch).", IsRequired = true)]
         public string Action { get; set; }
 
-        [Argument(Name = nameof(Version), Description = "The version number to set on the given action (default: previous version increased by 1).", IsRequired = false)]
-        public int Version = -1;
+        [Argument(Name = nameof(Major), Description = "The forced major version.", IsRequired = false)]
+        public int Major { get; set; } = -1;
+
+        [Argument(Name = nameof(Minor), Description = "The forced minor version.", IsRequired = false)]
+        public int Minor { get; set; } = -1;
+
+        [Argument(Name = nameof(Patch), Description = "The forced patch version.", IsRequired = false)]
+        public int Patch { get; set; } = -1;
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
@@ -75,15 +81,21 @@ namespace Dnt.Commands.Projects
 
             if (Action == "major")
             {
-                return (Version == -1 ? int.Parse(segments[0]) + 1 : Version) + ".0.0";
+                return (Major == -1 ? int.Parse(segments[0]) + 1 : Major) + "." +
+                       (Minor == -1 ? "0" : Minor.ToString()) + "." +
+                       (Patch == -1 ? "0" : Patch.ToString());
             }
             else if (Action == "minor")
             {
-                return segments[0] + "." + (Version == -1 ? int.Parse(segments[1]) + 1 : Version) + ".0";
+                return (Major == -1 ? segments[0] : Major.ToString()) + "." +
+                       (Minor == -1 ? int.Parse(segments[1]) + 1 : Minor) + "." +
+                       (Patch == -1 ? "0" : Patch.ToString());
             }
             else
             {
-                return segments[0] + "." + segments[1] + "." + (Version == -1 ? int.Parse(segments[2]) + 1 : Version);
+                return (Major == -1 ? segments[0] : Major.ToString()) + "." +
+                       (Minor == -1 ? segments[1] : Minor.ToString()) + "." +
+                       (Patch == -1 ? int.Parse(segments[2]) + 1 : Patch);
             }
         }
     }
