@@ -11,6 +11,8 @@ dotnet tool install -g dnt
 
 ## Package Commands
 
+By default, all commands search in the current directory for all `*.csproj` files and applies the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
+
 ### install-packages
 
 ### switch-to-projects
