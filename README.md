@@ -3,7 +3,7 @@
 
 **Experimental: Command and parameter names may change**
 
-Install: 
+Install (.NET Core 2.1+ only): 
 
 ```
 dotnet tool install -g dnt
