@@ -6,7 +6,7 @@
 Install: 
 
 ```
-dotnet tool install -g dotnetsay
+dotnet tool install -g dnt
 ```
 
 ## Package Commands
