@@ -1,6 +1,8 @@
 # DNT (DotNetTools)
 ## Command line tools to manage .NET projects and solutions
 
+[![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
+
 **Experimental: Command and parameter names may change**
 
 Install (.NET Core 2.1+ only): 
