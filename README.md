@@ -3,6 +3,12 @@
 
 **Experimental: Command and parameter names may change**
 
+Install: 
+
+```
+dotnet tool install -g dotnetsay
+```
+
 ## Package Commands
 
 ### install-packages
