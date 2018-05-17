@@ -48,7 +48,7 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private void RemoveProjectsFromSolution(ReferenceSwitcherConfiguration configuration)
+        private async Task RemoveProjectsFromSolutionAsync(ReferenceSwitcherConfiguration configuration)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
@@ -63,7 +63,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                ProcessUtilities.Execute("dotnet sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects));
+                await ProcessUtilities.ExecuteAsync("dotnet sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects));
             }
         }
 

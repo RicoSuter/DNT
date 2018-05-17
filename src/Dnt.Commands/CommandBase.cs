@@ -11,7 +11,7 @@ namespace Dnt.Commands
 
         public abstract Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host);
 
-        protected void ExecuteCommand(string command, IConsoleHost host)
+        protected async Task ExecuteCommandAsync(string command, IConsoleHost host)
         {
             if (Simulate)
             {
@@ -19,7 +19,7 @@ namespace Dnt.Commands
             }
             else
             {
-                ProcessUtilities.Execute(command);
+                await ProcessUtilities.ExecuteAsync(command);
             }
         }
     }

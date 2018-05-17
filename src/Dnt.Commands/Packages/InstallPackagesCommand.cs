@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NConsole;
 
@@ -13,27 +14,36 @@ namespace Dnt.Commands.Packages
         [Argument(Name = "version", IsRequired = true)]
         public string Version { get; set; }
 
-        public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
-        {
-            var segments = Version.Split('.');
-            var version =
-                segments.Length == 2 && segments[1] == "*" ? "[" + segments[0] + "," + (int.Parse(segments[0]) + 1) + ")" :
-                segments.Length == 3 && segments[2] == "*" ? "[" + segments[0] + "." + segments[1] + "," + segments[0] + "," + (int.Parse(segments[1]) + 1) + ")" :
-                Version;
+        [Argument(Name = nameof(EnforceRanges), IsRequired = false)]
+        public bool EnforceRanges { get; set; } = true;
 
-            foreach (var projectPath in GetProjectPaths())
+        public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        {
+            var version = Version;
+
+            if (EnforceRanges)
             {
-                try
-                {
-                    ExecuteCommand("dotnet add \"" + projectPath + "\" package " + Package + " -v " + version, host);
-                }
-                catch (Exception e)
-                {
-                    host.WriteError(e + "\n");
-                }
+                var segments = Version.Split('.');
+                version =
+                    segments.Length == 2 && segments[1] == "*" ? "[" + segments[0] + "," + (int.Parse(segments[0]) + 1) + ")" :
+                    segments.Length == 3 && segments[2] == "*" ? "[" + segments[0] + "." + segments[1] + "," + segments[0] + "," + (int.Parse(segments[1]) + 1) + ")" :
+                    Version;
             }
 
-            return Task.FromResult<object>(null);
+            await Task.WhenAll(GetProjectPaths()
+                .Select(projectPath => Task.Run(async () =>
+                {
+                    try
+                    {
+                        await ExecuteCommandAsync("dotnet add \"" + projectPath + "\" package " + Package + " -v " + version, host);
+                    }
+                    catch (Exception e)
+                    {
+                        host.WriteError(e + "\n");
+                    }
+                })));
+
+            return null;
         }
     }
 }

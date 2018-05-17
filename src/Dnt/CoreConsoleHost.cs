@@ -8,7 +8,7 @@ namespace Dnt
     {
         public void WriteMessage(string message)
         {
-            Console.Write(message);
+            ConsoleUtilities.Write(message);
         }
 
         public void WriteError(string message)
@@ -18,7 +18,7 @@ namespace Dnt
 
         public string ReadValue(string message)
         {
-            Console.Write(message);
+            ConsoleUtilities.Write(message);
             return Console.ReadLine();
         }
     }

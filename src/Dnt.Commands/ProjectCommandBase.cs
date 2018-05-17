@@ -1,17 +1,25 @@
 ﻿using System.IO;
+using System.Linq;
+using Microsoft.Build.Construction;
 using NConsole;
 
 namespace Dnt.Commands
 {
     public abstract class ProjectCommandBase : CommandBase
     {
-        [Argument(Name = "path", Description = "The path to a single .csproj, directory containing .csprojs or empty for the current directory.", IsRequired = false)]
+        [Argument(Name = "path", Description = "The path to a single .csproj, an .sln, a directory containing .csprojs or empty for scanning the current directory for .csprojs.", IsRequired = false)]
         public string Path { get; set; }
 
         protected string[] GetProjectPaths()
         {
             if (File.Exists(Path))
             {
+                if (Path.EndsWith(".sln"))
+                {
+                    var solution = SolutionFile.Parse(Path);
+                    return solution.ProjectsInOrder.Select(p => p.AbsolutePath).ToArray();
+                }
+
                 return new[] { Path };
             }
 

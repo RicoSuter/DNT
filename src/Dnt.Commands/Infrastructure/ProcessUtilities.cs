@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Dnt.Commands.Infrastructure
 {
     public static class ProcessUtilities
     {
-        public static void Execute(string command)
+        public static Task ExecuteAsync(string command)
         {
+            var taskSource = new TaskCompletionSource<object>();
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -29,17 +31,19 @@ namespace Dnt.Commands.Infrastructure
             process.OutputDataReceived += (sendingProcess, args) =>
             {
                 if (args.Data != null)
-                    Console.Write(args.Data + "\n");
+                    ConsoleUtilities.Write(args.Data + "\n");
             };
 
             ConsoleUtilities.WriteInfo("Executing: " + command + "\n");
             process.Start();
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
-            process.WaitForExit();
+            process.Exited += (sender, args) => taskSource.SetResult(null);
 
             if (process.ExitCode != 0)
                 throw new InvalidOperationException("Process execution failed: " + command);
+
+            return taskSource.Task;
         }
     }
 }

@@ -14,12 +14,23 @@ namespace Dnt.Commands.Infrastructure
             WriteColor(message, ConsoleColor.Green);
         }
 
+        public static void Write(string message)
+        {
+            lock (typeof(ConsoleUtilities))
+            {
+                Console.Write(message);
+            }
+        }
+
         public static void WriteColor(string message, ConsoleColor color)
         {
-            var savedColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.Write(message);
-            Console.ForegroundColor = savedColor;
+            lock (typeof(ConsoleUtilities))
+            {
+                var savedColor = Console.ForegroundColor;
+                Console.ForegroundColor = color;
+                Console.Write(message);
+                Console.ForegroundColor = savedColor;
+            }
         }
     }
 }

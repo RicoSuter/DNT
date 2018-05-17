@@ -23,7 +23,7 @@ namespace Dnt.Commands.Solutions
             if (Directory.Exists(Name))
                 throw new InvalidOperationException("The project '" + Name + "' already exists.");
 
-            InstallTemplates();
+            await InstallTemplatesAsync();
 
             var rootDirectory = Directory.GetCurrentDirectory();
             var repositoryDirectory = Path.Combine(rootDirectory, Name);
@@ -37,33 +37,35 @@ namespace Dnt.Commands.Solutions
             Directory.CreateDirectory(appDirectory);
             Directory.CreateDirectory(clientsDirectory);
 
-            CreateApplicationProject(appDirectory);
-            CreateClientsProject(clientsDirectory);
+            await CreateApplicationProjectAsync(appDirectory);
+            await CreateClientsProjectAsync(clientsDirectory);
 
             return null;
         }
 
-        private static void InstallTemplates()
+        private static async Task InstallTemplatesAsync()
         {
-            Console.Write("Install templates? [yes|no]");
+            ConsoleUtilities.Write("Install templates? [yes|no]");
             if (Console.ReadLine() == "yes")
-                ProcessUtilities.Execute("dotnet new --install Microsoft.AspNetCore.SpaTemplates::*");
+                await ProcessUtilities.ExecuteAsync("dotnet new --install Microsoft.AspNetCore.SpaTemplates::*");
         }
 
-        private void CreateApplicationProject(string appDirectory)
+        private async Task CreateApplicationProjectAsync(string appDirectory)
         {
             Directory.SetCurrentDirectory(appDirectory);
-            ProcessUtilities.Execute("dotnet new " + Type);
-            ProcessUtilities.Execute("dotnet restore");
+
+            await ProcessUtilities.ExecuteAsync("dotnet new " + Type);
+            await ProcessUtilities.ExecuteAsync("dotnet restore");
+
             if (File.Exists("package.json"))
-                ProcessUtilities.Execute("npm i");
+                await ProcessUtilities.ExecuteAsync("npm i");
         }
 
-        private static void CreateClientsProject(string clientsDirectory)
+        private static async Task CreateClientsProjectAsync(string clientsDirectory)
         {
             Directory.SetCurrentDirectory(clientsDirectory);
-            ProcessUtilities.Execute("dotnet new classlib");
-            ProcessUtilities.Execute("dotnet restore");
+            await ProcessUtilities.ExecuteAsync("dotnet new classlib");
+            await ProcessUtilities.ExecuteAsync("dotnet restore");
         }
     }
 }

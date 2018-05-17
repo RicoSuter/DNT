@@ -17,19 +17,19 @@ namespace Dnt.Commands.Packages
         [Argument(Position = 1)]
         public string Configuration { get; set; }
 
-        public Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
 
-            AddProjectsToSolution(configuration);
+            await AddProjectsToSolutionAsync(configuration);
             SwitchToProjects(configuration, host);
 
             configuration.Save();
 
-            return Task.FromResult<object>(null);
+            return null;
         }
 
-        private void AddProjectsToSolution(ReferenceSwitcherConfiguration configuration)
+        private async Task AddProjectsToSolutionAsync(ReferenceSwitcherConfiguration configuration)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
@@ -43,7 +43,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                ProcessUtilities.Execute("dotnet sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects));
+                await ProcessUtilities.ExecuteAsync("dotnet sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects));
             }
         }
 
