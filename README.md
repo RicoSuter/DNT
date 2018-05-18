@@ -1,5 +1,5 @@
 # DNT (DotNetTools)
-## Command line tools to manage .NET projects and solutions
+## Command line tools to manage .NET Core and Standard projects and solutions
 
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 
@@ -14,6 +14,12 @@ dotnet tool install -g dnt
 ## Package Commands
 
 By default, all commands search in the current directory for all `*.csproj` files and applies the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
+
+To list all currently selected project, call:
+
+```
+dnt list-projects
+```
 
 ### install-packages
 
@@ -35,7 +41,8 @@ dnt update-packages PackagesToUpdate [TargetPackageVersion]
 
 **Parameters:**
 
-- package: The package ID to update, also supports * wildcards
+- PackagesToUpdate: The package ID to update, also supports * wildcards
+- TargetPacketVersion: The targeted package version (default: latest)
 
 **Samples:**
 
