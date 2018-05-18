@@ -38,10 +38,13 @@ namespace Dnt.Commands.Infrastructure
             process.Start();
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
-            process.Exited += (sender, args) => taskSource.SetResult(null);
-
-            if (process.ExitCode != 0)
-                throw new InvalidOperationException("Process execution failed: " + command);
+            process.Exited += (sender, args) =>
+            {
+                if (process.ExitCode != 0)
+                    taskSource.SetException(new InvalidOperationException("Process execution failed: " + command));
+                else
+                    taskSource.SetResult(null);
+            };
 
             return taskSource.Task;
         }

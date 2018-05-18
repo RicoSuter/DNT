@@ -21,7 +21,6 @@ namespace Dnt.Commands.Packages
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-
             string version = null;
             if (EnforceRanges && !string.IsNullOrEmpty(Version))
             {
@@ -33,21 +32,35 @@ namespace Dnt.Commands.Packages
             }
 
             var packageRegex = new Regex("^" + Package.Replace(".", "\\.").Replace("*", ".*") + "$");
-
-            await Task.WhenAll(GetProjectPaths()
-                .Select(projectPath => Task.Run(async () =>
-                    await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version)
+            if (NoParallel)
+            {
+                using (var projectCollection = new ProjectCollection())
+                {
+                    foreach (var projectPath in GetProjectPaths())
+                    {
+                        projectCollection.LoadProject(projectPath);
+                        await UpgradeProjectPackagesAsync(projectCollection, host, projectPath, packageRegex, version);
+                    }
+                }
+            }
+            else
+            {
+                await Task.WhenAll(GetProjectPaths().Select(projectPath => Task.Run(async () =>
+                {
+                    using (var projectCollection = new ProjectCollection())
+                        await UpgradeProjectPackagesAsync(projectCollection, host, projectPath, packageRegex, version);
+                }
                 )));
+            }
 
             return null;
         }
 
-        private async Task UpgradeProjectPackagesAsync(IConsoleHost host, string projectPath, Regex packageRegex, string version)
+        private async Task UpgradeProjectPackagesAsync(ProjectCollection projectCollection, IConsoleHost host, string projectPath, Regex packageRegex, string version)
         {
             try
             {
-                var collection = new ProjectCollection();
-                var project = collection.LoadProject(projectPath);
+                var project = projectCollection.LoadProject(projectPath);
 
                 var packages = project.Items
                     .Where(i => i.ItemType == "PackageReference" &&
@@ -55,8 +68,6 @@ namespace Dnt.Commands.Packages
                                 i.EvaluatedInclude != "Microsoft.NETCore.App")
                     .Select(i => i.EvaluatedInclude)
                     .ToList();
-
-                collection.UnloadProject(project);
 
                 foreach (var package in packages)
                 {

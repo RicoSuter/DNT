@@ -14,6 +14,7 @@ namespace Dnt
             if (Debugger.IsAttached)
                 Directory.SetCurrentDirectory("C:\\Data\\Projects\\Playground");
 
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 var processor = new CommandLineProcessor(new CoreConsoleHost());
@@ -24,6 +25,7 @@ namespace Dnt
             {
                 ConsoleUtilities.WriteError(e.ToString());
             }
+            ConsoleUtilities.WriteColor("Elapsed time: " + stopwatch.Elapsed, ConsoleColor.DarkCyan);
 
             if (Debugger.IsAttached)
                 Console.ReadLine();
