@@ -41,7 +41,8 @@ dnt update-packages PackagesToUpdate [TargetPackageVersion]
 
 **Parameters:**
 
-- package: The package ID to update, also supports * wildcards
+- PackagesToUpdate: The package ID to update, also supports * wildcards
+- TargetPacketVersion: The targeted package version (default: latest)
 
 **Samples:**
 
