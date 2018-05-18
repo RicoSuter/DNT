@@ -15,6 +15,12 @@ dotnet tool install -g dnt
 
 By default, all commands search in the current directory for all `*.csproj` files and applies the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
 
+To list all currently selected project, call:
+
+```
+dnt list-projects
+```
+
 ### install-packages
 
 ### switch-to-projects
