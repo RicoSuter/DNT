@@ -12,6 +12,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dnt.Npm", "Dnt.Npm", "{54DC7CD7-F05E-479E-855E-9626613B575A}"
+	ProjectSection(SolutionItems) = preProject
+		Dnt.Npm\package.json = Dnt.Npm\package.json
+		Dnt.Npm\README.md = Dnt.Npm\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bin", "bin", "{803FD821-3506-4B5F-9580-8770C66AB32E}"
+	ProjectSection(SolutionItems) = preProject
+		Dnt.Npm\bin\dnt.js = Dnt.Npm\bin\dnt.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +40,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{803FD821-3506-4B5F-9580-8770C66AB32E} = {54DC7CD7-F05E-479E-855E-9626613B575A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CD32D3B-9417-44A1-B6F1-7494FB50C26A}

@@ -10,10 +10,20 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <PackageId>DNT</PackageId>
-    <!--<PackAsTool>true</PackAsTool>-->
+    <PackAsTool>true</PackAsTool>
     <DebugType>embedded</DebugType>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net462'">
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net462'">
+    <OutputPath>..\Dnt.Npm\bin\binaries\Win</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netcoreapp2.1'">
+    <OutputPath>..\Dnt.Npm\bin\binaries\NetCore21</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />

@@ -1,0 +1,33 @@
+{
+  "name": "dotnettools",
+  "version": "1.0.3",
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RSuter/DNT.git"
+  },
+  "scripts": {},
+  "author": {
+    "name": "Rico Suter",
+    "email": "mail@rsuter.com",
+    "url": "http://rsuter.com"
+  },
+  "bin": {
+    "dnt": "bin/dnt.js"
+  },
+  "bugs": {
+    "url": "https://github.com/RSuter/DNT/issues"
+  },
+  "engines": {
+    "npm": ">=3.10.8"
+  },
+  "description": "DNT (DotNetTools).",
+  "directories": {},
+  "homepage": "https://github.com/RSuter/DNT",
+  "installable": true,
+  "keywords": [
+    "dnt",
+    "dotnet"
+  ],
+  "license": "MIT"
+}
