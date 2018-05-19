@@ -44,6 +44,65 @@ dnt install-packages PackageToInstall [TargetPackageVersion]
 
 TBD
 
+### update-packages
+
+**Command:**
+
+```
+dnt update-packages PackagesToUpdate [TargetPackageVersion]
+```
+
+**Parameters:**
+
+- PackagesToUpdate: The package ID to update, also supports * wildcards
+- TargetPacketVersion: The targeted package version (default: latest)
+
+**Samples:**
+
+Update the Newtonsoft.Json packages in the selected projects to version 10.0.1:
+
+```
+dnt update-packages Newtonsoft.Json 10.0.1
+```
+
+Update all packages in the selected projects to the latest version:
+
+```
+dnt update-packages *
+```
+
+Update all packages wich start with "MyCommonPackages." in the selected projects to version 2.1.0:
+
+```
+dnt update-packages MyCommonPackages.* 2.1.0
+```
+
+### bump-version
+
+**Command:**
+
+```
+dnt bump-version major|minor|patch [/major:number] [/minor:number] [/patch:number] [/path:ProjectDirectoryPath]
+```
+
+**Parameters:**
+
+TBD
+
+**Samples:**
+
+Bump the minor version of all selected projects by 1:
+
+```
+dnt bump-version minor
+```
+
+Sets the patch version of all selected projects to 18:
+
+```
+dnt bump-version patch /patch:18
+```
+
 ### switch-to-projects
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
@@ -84,67 +143,6 @@ After implementing and testing, switch back to NuGet references:
 
 ```
 dnt switch-to-packages njs-switch.dnt
-```
-
-### update-packages
-
-**Command:**
-
-```
-dnt update-packages PackagesToUpdate [TargetPackageVersion]
-```
-
-**Parameters:**
-
-- PackagesToUpdate: The package ID to update, also supports * wildcards
-- TargetPacketVersion: The targeted package version (default: latest)
-
-**Samples:**
-
-Update the Newtonsoft.Json packages in the selected projects to version 10.0.1:
-
-```
-dnt update-packages Newtonsoft.Json 10.0.1
-```
-
-Update all packages in the selected projects to the latest version:
-
-```
-dnt update-packages *
-```
-
-Update all packages wich start with "MyCommonPackages." in the selected projects to version 2.1.0:
-
-```
-dnt update-packages MyCommonPackages.* 2.1.0
-```
-
-## Project Commands
-
-### bump-version
-
-**Command:**
-
-```
-dnt bump-version major|minor|patch [/major:number] [/minor:number] [/patch:number] [/path:ProjectDirectoryPath]
-```
-
-**Parameters:**
-
-TBD
-
-**Samples:**
-
-Bump the minor version of all selected projects by 1:
-
-```
-dnt bump-version minor
-```
-
-Sets the patch version of all selected projects to 18:
-
-```
-dnt bump-version patch /patch:18
 ```
 
 ## Solution Commands
