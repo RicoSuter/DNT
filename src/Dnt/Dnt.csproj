@@ -16,9 +16,9 @@
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net462'">
+  <!--<PropertyGroup Condition="'$(TargetFramework)'=='net462'">
     <IncludeBuildOutput>false</IncludeBuildOutput>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net462'">
     <OutputPath>..\Dnt.Npm\bin\binaries\Win</OutputPath>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     <PackageReference Include="Microsoft.Build" Version="15.6.85" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.6.85" />
     <PackageReference Include="NConsole" Version="3.12.6605.26941" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
 </Project>

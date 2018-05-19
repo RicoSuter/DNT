@@ -1,0 +1,9 @@
+{
+  "solution": "Dnt.sln",
+  "mappings": {
+    "NJsonSchema": {
+      "version": null,
+      "path": "../../NConsole/src/NConsole/NConsole.csproj"
+    }
+  }
+}
