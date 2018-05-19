@@ -75,10 +75,10 @@ Update all packages in the selected projects to the latest version:
 dnt update-packages *
 ```
 
-Update all packages wich start with "MyCommonPackages." in the selected projects to version 2.1.0:
+Update all packages which start with "MyPackages." in the selected projects to version 2.1.0:
 
 ```
-dnt update-packages MyCommonPackages.* 2.1.0
+dnt update-packages MyPackages.* 2.1.0
 ```
 
 ### bump-version
@@ -103,7 +103,7 @@ Bump the minor version of all selected projects by 1:
 dnt bump-version minor
 ```
 
-Sets the patch version of all selected projects to 18:
+Set the patch version of all selected projects to 18:
 
 ```
 dnt bump-version patch /patch:18
