@@ -5,10 +5,23 @@
 
 **Experimental: Command and parameter names may change**
 
-Install (.NET Core 2.1+ only): 
+Install via NPM (.NET 4.6.2 and .NET Core 2.1+)
+
+```
+npm i -g dotnettools
+```
+
+Install .NET Core global tool (.NET Core 2.1+ only, not ready): 
 
 ```
 dotnet tool install -g dnt
+```
+
+Uninstall 
+
+```
+npm uninstall -g dotnettools
+dotnet tool uninstall -g dnt
 ```
 
 ## Package Commands
@@ -23,15 +36,19 @@ dnt list-projects
 
 ### install-packages
 
-### switch-to-projects
+Installs a NuGet package in the selected projects.
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard
+**Command:**
 
-### switch-to-packages
+```
+dnt install-packages PackageToInstall [TargetPackageVersion]
+```
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard
+TBD
 
 ### update-packages
+
+Updates NuGet packages in the selected projects.
 
 **Command:**
 
@@ -64,9 +81,9 @@ Update all packages wich start with "MyCommonPackages." in the selected projects
 dnt update-packages MyCommonPackages.* 2.1.0
 ```
 
-## Project Commands
-
 ### bump-version
+
+Increases or changes the package version of the selected projects.
 
 **Command:**
 
@@ -92,6 +109,53 @@ Sets the patch version of all selected projects to 18:
 dnt bump-version patch /patch:18
 ```
 
+### switch-to-projects
+
+Switches from NuGet package references to local project references for refactorings, debugging, etc.
+
+This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
+
+Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects: 
+
+```json
+{
+  "solution": "NSwag.sln",
+  "mappings": {
+    "NJsonSchema": {
+      "path": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj"
+    },
+    "NJsonSchema.CodeGeneration": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj"
+    },
+    "NJsonSchema.CodeGeneration.CSharp": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj"
+    },
+    "NJsonSchema.CodeGeneration.TypeScript": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
+    }
+  }
+}
+```
+
+Then switch to projects in the solution: 
+
+```
+dnt switch-to-projects njs-switch.dnt
+```
+
+Now all NJsonSchema package references in the NSwag solution are now replaced by local project references and the NJsonSchema projects added to the solution.
+
+### switch-to-packages
+
+After implementing and testing, switch back to NuGet references: 
+
+```
+dnt switch-to-packages njs-switch.dnt
+```
+
 ## Solution Commands
 
 ### create-solution
+
+TBD
