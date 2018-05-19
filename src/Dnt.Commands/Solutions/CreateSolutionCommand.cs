@@ -7,7 +7,7 @@ using NConsole;
 namespace Dnt.Commands.Solutions
 {
     [Command(Name = "create-solution")]
-    public class CreateSolutionCommand : IConsoleCommand
+    public class CreateSolutionCommand : CommandBase
     {
         [Argument(Position = 1)]
         public string Type { get; set; }
@@ -15,7 +15,7 @@ namespace Dnt.Commands.Solutions
         [Argument(Name = "Name", IsRequired = true)]
         public string Name { get; set; }
 
-        public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             if (string.IsNullOrEmpty(Name))
                 throw new ArgumentNullException(nameof(Name));
@@ -23,7 +23,7 @@ namespace Dnt.Commands.Solutions
             if (Directory.Exists(Name))
                 throw new InvalidOperationException("The project '" + Name + "' already exists.");
 
-            await InstallTemplatesAsync();
+            await InstallTemplatesAsync(host);
 
             var rootDirectory = Directory.GetCurrentDirectory();
             var repositoryDirectory = Path.Combine(rootDirectory, Name);
@@ -37,35 +37,35 @@ namespace Dnt.Commands.Solutions
             Directory.CreateDirectory(appDirectory);
             Directory.CreateDirectory(clientsDirectory);
 
-            await CreateApplicationProjectAsync(appDirectory);
-            await CreateClientsProjectAsync(clientsDirectory);
+            await CreateApplicationProjectAsync(appDirectory, host);
+            await CreateClientsProjectAsync(clientsDirectory, host);
 
             return null;
         }
 
-        private static async Task InstallTemplatesAsync()
+        private async Task InstallTemplatesAsync(IConsoleHost host)
         {
             ConsoleUtilities.Write("Install templates? [yes|no]");
             if (Console.ReadLine() == "yes")
-                await ProcessUtilities.ExecuteAsync("dotnet new --install Microsoft.AspNetCore.SpaTemplates::*");
+                await ExecuteCommandAsync("dotnet new --install Microsoft.AspNetCore.SpaTemplates::*", host);
         }
 
-        private async Task CreateApplicationProjectAsync(string appDirectory)
+        private async Task CreateApplicationProjectAsync(string appDirectory, IConsoleHost host)
         {
             Directory.SetCurrentDirectory(appDirectory);
 
-            await ProcessUtilities.ExecuteAsync("dotnet new " + Type);
-            await ProcessUtilities.ExecuteAsync("dotnet restore");
+            await ExecuteCommandAsync("dotnet new " + Type, host);
+            await ExecuteCommandAsync("dotnet restore", host);
 
             if (File.Exists("package.json"))
-                await ProcessUtilities.ExecuteAsync("npm i");
+                await ExecuteCommandAsync("npm i", host);
         }
 
-        private static async Task CreateClientsProjectAsync(string clientsDirectory)
+        private async Task CreateClientsProjectAsync(string clientsDirectory, IConsoleHost host)
         {
             Directory.SetCurrentDirectory(clientsDirectory);
-            await ProcessUtilities.ExecuteAsync("dotnet new classlib");
-            await ProcessUtilities.ExecuteAsync("dotnet restore");
+            await ExecuteCommandAsync("dotnet new classlib", host);
+            await ExecuteCommandAsync("dotnet restore", host);
         }
     }
 }

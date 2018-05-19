@@ -6,7 +6,7 @@ namespace Dnt.Commands.Infrastructure
 {
     public static class ProcessUtilities
     {
-        public static async Task ExecuteAsync(string command)
+        public static async Task ExecuteAsync(string command, bool verbose)
         {
             var taskSource = new TaskCompletionSource<object>();
             var process = new Process
@@ -22,16 +22,16 @@ namespace Dnt.Commands.Infrastructure
                 }
             };
 
+            process.OutputDataReceived += (sendingProcess, args) =>
+            {
+                if (args.Data != null && verbose)
+                    ConsoleUtilities.Write(args.Data + "\n");
+            };
+
             process.ErrorDataReceived += (sendingProcess, args) =>
             {
                 if (args.Data != null)
                     ConsoleUtilities.WriteError(args.Data + "\n");
-            };
-
-            process.OutputDataReceived += (sendingProcess, args) =>
-            {
-                if (args.Data != null)
-                    ConsoleUtilities.Write(args.Data + "\n");
             };
 
             ConsoleUtilities.WriteInfo("Executing: " + command + "\n");

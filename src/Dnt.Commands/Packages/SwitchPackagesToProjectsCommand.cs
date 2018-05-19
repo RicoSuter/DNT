@@ -12,16 +12,16 @@ using NConsole;
 namespace Dnt.Commands.Packages
 {
     [Command(Name = "switch-to-projects")]
-    public class SwitchPackagesToProjectsCommand : IConsoleCommand
+    public class SwitchPackagesToProjectsCommand : CommandBase
     {
         [Argument(Position = 1)]
         public string Configuration { get; set; }
 
-        public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
 
-            await AddProjectsToSolutionAsync(configuration);
+            await AddProjectsToSolutionAsync(configuration, host);
             SwitchToProjects(configuration, host);
 
             configuration.Save();
@@ -29,7 +29,7 @@ namespace Dnt.Commands.Packages
             return null;
         }
 
-        private async Task AddProjectsToSolutionAsync(ReferenceSwitcherConfiguration configuration)
+        private async Task AddProjectsToSolutionAsync(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
@@ -43,7 +43,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                await ProcessUtilities.ExecuteAsync("dotnet sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects));
+                await ExecuteCommandAsync("dotnet sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects), host);
             }
         }
 

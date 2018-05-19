@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
 using NConsole;
@@ -16,7 +17,7 @@ namespace Dnt.Commands
             {
                 if (Path.EndsWith(".sln"))
                 {
-                    var solution = SolutionFile.Parse(Path);
+                    var solution = SolutionFile.Parse(System.IO.Path.GetFullPath(Path));
                     return solution.ProjectsInOrder.Select(p => p.AbsolutePath).ToArray();
                 }
 

@@ -12,21 +12,21 @@ using NConsole;
 namespace Dnt.Commands.Packages
 {
     [Command(Name = "switch-to-packages")]
-    public class SwitchProjectsToPackagesCommand : IConsoleCommand
+    public class SwitchProjectsToPackagesCommand : CommandBase
     {
         [Argument(Position = 1)]
         public string Configuration { get; set; }
 
-        public Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
 
             SwitchToPackages(host, configuration);
-            //RemoveProjectsFromSolution(configuration); // TODO: This also removes some unrelated solution folders
+            await RemoveProjectsFromSolutionAsync(configuration, host);
 
             configuration.Save();
 
-            return Task.FromResult<object>(null);
+            return null;
         }
 
         private void SwitchToPackages(IConsoleHost host, ReferenceSwitcherConfiguration configuration)
@@ -48,7 +48,7 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private async Task RemoveProjectsFromSolutionAsync(ReferenceSwitcherConfiguration configuration)
+        private async Task RemoveProjectsFromSolutionAsync(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
@@ -63,7 +63,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                await ProcessUtilities.ExecuteAsync("dotnet sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects));
+                await ExecuteCommandAsync("dotnet sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects), host);
             }
         }
 

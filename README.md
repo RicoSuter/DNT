@@ -6,13 +6,13 @@
 
 **Experimental: Command and parameter names may change**
 
-Install via NPM (.NET 4.6.2 and .NET Core 2.1+)
+Globally install via NPM (.NET 4.6.2 and .NET Core 2.1+)
 
 ```
 npm i -g dotnettools
 ```
 
-Install .NET Core global tool (.NET Core 2.1+ only, not ready): 
+Install .NET Core global tool (.NET Core 2.1+ only, not working yet): 
 
 ```
 dotnet tool install -g dnt
@@ -29,7 +29,7 @@ dotnet tool uninstall -g dnt
 
 By default, all commands search in the current directory for all `*.csproj` files and applies the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
 
-To list all currently selected project, call:
+To list all currently selected projects, call:
 
 ```
 dnt list-projects
@@ -42,10 +42,14 @@ Installs a NuGet package in the selected projects.
 **Command:**
 
 ```
-dnt install-packages PackageToInstall [TargetPackageVersion]
+dnt install-packages PackageToInstall [TargetPackageVersion] [/path:ProjectDirectoryPath]
 ```
 
-TBD
+**Parameters:**
+
+- PackageToInstall
+- TargetPackageVersion
+- ProjectDirectoryPath
 
 ### update-packages
 
@@ -54,17 +58,18 @@ Updates NuGet packages in the selected projects.
 **Command:**
 
 ```
-dnt update-packages PackagesToUpdate [TargetPackageVersion]
+dnt update-packages PackagesToUpdate [TargetPackageVersion] [/path:ProjectDirectoryPath]
 ```
 
 **Parameters:**
 
 - PackagesToUpdate: The package ID to update, also supports * wildcards
 - TargetPacketVersion: The targeted package version (default: latest)
+- ProjectDirectoryPath
 
 **Samples:**
 
-Update the Newtonsoft.Json packages in the selected projects to version 10.0.1:
+Update the `Newtonsoft.Json` packages in the selected projects to version `10.0.1`:
 
 ```
 dnt update-packages Newtonsoft.Json 10.0.1
@@ -76,7 +81,7 @@ Update all packages in the selected projects to the latest version:
 dnt update-packages *
 ```
 
-Update all packages which start with "MyPackages." in the selected projects to version 2.1.0:
+Update all packages which start with `MyPackages.` in the selected projects to version `2.1.0`:
 
 ```
 dnt update-packages MyPackages.* 2.1.0
