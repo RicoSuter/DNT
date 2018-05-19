@@ -34,8 +34,7 @@ To list all currently selected project, call:
 ```
 dnt list-projects
 
-// with path:
-dnt list-projects [/path:ProjectDirectoryPath]
+dnt list-projects /path:MySolution.sln
 ```
 
 ### install-packages
