@@ -2,6 +2,7 @@
 ## Command line tools to manage .NET Core and Standard projects and solutions
 
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
+[![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
 **Experimental: Command and parameter names may change**
 
