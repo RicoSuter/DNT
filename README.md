@@ -36,6 +36,8 @@ dnt list-projects
 
 ### install-packages
 
+Installs a NuGet package in the selected projects.
+
 **Command:**
 
 ```
@@ -45,6 +47,8 @@ dnt install-packages PackageToInstall [TargetPackageVersion]
 TBD
 
 ### update-packages
+
+Updates NuGet packages in the selected projects.
 
 **Command:**
 
@@ -79,6 +83,8 @@ dnt update-packages MyCommonPackages.* 2.1.0
 
 ### bump-version
 
+Increases or changes the package version of the selected projects.
+
 **Command:**
 
 ```
@@ -105,8 +111,9 @@ dnt bump-version patch /patch:18
 
 ### switch-to-projects
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+Switches from NuGet package references to local project references for refactorings, debugging, etc.
 
+This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
 Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
 
 Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects: 
