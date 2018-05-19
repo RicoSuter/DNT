@@ -36,6 +36,14 @@ dnt list-projects
 
 ### install-packages
 
+**Command:**
+
+```
+dnt install-packages PackageToInstall [TargetPackageVersion]
+```
+
+TBD
+
 ### switch-to-projects
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
