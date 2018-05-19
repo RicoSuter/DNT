@@ -33,6 +33,9 @@ To list all currently selected project, call:
 
 ```
 dnt list-projects
+
+// with path:
+dnt list-projects [/path:ProjectDirectoryPath]
 ```
 
 ### install-packages
@@ -42,7 +45,7 @@ Installs a NuGet package in the selected projects.
 **Command:**
 
 ```
-dnt install-packages PackageToInstall [TargetPackageVersion]
+dnt install-packages PackageToInstall [TargetPackageVersion] [/path:ProjectDirectoryPath]
 ```
 
 TBD
@@ -54,7 +57,7 @@ Updates NuGet packages in the selected projects.
 **Command:**
 
 ```
-dnt update-packages PackagesToUpdate [TargetPackageVersion]
+dnt update-packages PackagesToUpdate [TargetPackageVersion] [/path:ProjectDirectoryPath]
 ```
 
 **Parameters:**
