@@ -120,7 +120,7 @@ Create `njs-switch.dnt` file and specify the solution to look for projects, and 
 
 ```json
 {
-  "solution": "NSwag.Min.sln",
+  "solution": "NSwag.sln",
   "mappings": {
     "NJsonSchema": {
       "path": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj"
@@ -143,6 +143,8 @@ Then switch to projects in the solution:
 ```
 dnt switch-to-projects njs-switch.dnt
 ```
+
+Now all NJsonSchema package references in the NSwag solution are now replaced by local project references and the NJsonSchema projects added to the solution.
 
 ### switch-to-packages
 
