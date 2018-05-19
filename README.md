@@ -5,10 +5,23 @@
 
 **Experimental: Command and parameter names may change**
 
-Install (.NET Core 2.1+ only): 
+Install via NPM (.NET 4.6.2 and .NET Core 2.1+)
+
+```
+npm i -g dotnettools
+```
+
+Install .NET Core global tool (.NET Core 2.1+ only, not ready): 
 
 ```
 dotnet tool install -g dnt
+```
+
+Uninstall 
+
+```
+npm uninstall -g dotnettools
+dotnet tool uninstall -g dnt
 ```
 
 ## Package Commands
