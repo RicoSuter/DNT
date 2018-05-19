@@ -10,7 +10,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <PackageId>DNT</PackageId>
     <!--<PackAsTool>true</PackAsTool>-->
     <DebugType>embedded</DebugType>
