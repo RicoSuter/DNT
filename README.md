@@ -27,12 +27,14 @@ dotnet tool uninstall -g dnt
 
 ## Package Commands
 
-By default, all commands search in the current directory for all `*.csproj` files and applies the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
+By default, all commands search in the current directory for all `*.csproj` files and apply the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
 
 To list all currently selected projects, call:
 
 ```
 dnt list-projects
+
+dnt list-projects /path:MySolution.sln
 ```
 
 ### install-packages
@@ -120,9 +122,10 @@ dnt bump-version patch /patch:18
 Switches from NuGet package references to local project references for refactorings, debugging, etc.
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+
 Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
 
-Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects: 
+Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
 
 ```json
 {
