@@ -38,11 +38,45 @@ dnt list-projects
 
 ### switch-to-projects
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard
+This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+
+Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
+
+Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects: 
+
+```json
+{
+  "solution": "NSwag.Min.sln",
+  "mappings": {
+    "NJsonSchema": {
+      "path": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj"
+    },
+    "NJsonSchema.CodeGeneration": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj"
+    },
+    "NJsonSchema.CodeGeneration.CSharp": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj"
+    },
+    "NJsonSchema.CodeGeneration.TypeScript": {
+      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
+    }
+  }
+}
+```
+
+Then switch to projects in the solution: 
+
+```
+dnt switch-to-projects njs-switch.dnt
+```
 
 ### switch-to-packages
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard
+After implementing and testing, switch back to NuGet references: 
+
+```
+dnt switch-to-packages njs-switch.dnt
+```
 
 ### update-packages
 
