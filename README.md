@@ -83,7 +83,7 @@ Update all packages in the selected projects to the latest version:
 dnt update-packages *
 ```
 
-Update all packages which start with `MyPackages.` in the selected projects to version `2.1.0`:
+Update all packages which start with `MyPackages.` to version `2.1.0` in the selected projects:
 
 ```
 dnt update-packages MyPackages.* 2.1.0
@@ -126,6 +126,8 @@ This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitche
 Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
 
 Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
+
+(here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution)
 
 ```json
 {
