@@ -6,9 +6,9 @@ using NConsole;
 
 namespace Dnt.Commands.Projects
 {
-    [Command(Name = "bump-version", Description = "Bumps the major, minor or patch version of the given projects. " +
-                                                  "Only projects with GeneratePackageOnBuild set are being processed.")]
-    public class BumpVersionCommand : ProjectCommandBase
+    [Command(Name = "bump-versions", Description = "Bumps the major, minor or patch version of the given projects. " +
+                                                   "Only projects with GeneratePackageOnBuild set are being processed.")]
+    public class BumpVersionsCommand : ProjectCommandBase
     {
         [Argument(Position = 1, Description = "The version part to update (major|minor|patch).", IsRequired = true)]
         public string Action { get; set; }
