@@ -30,7 +30,7 @@ namespace Dnt
             {
                 ConsoleUtilities.WriteError(e.ToString());
             }
-            ConsoleUtilities.WriteColor("Elapsed time: " + stopwatch.Elapsed, ConsoleColor.DarkCyan);
+            ConsoleUtilities.WriteColor("\nElapsed time: " + stopwatch.Elapsed, ConsoleColor.DarkCyan);
 
             if (Debugger.IsAttached)
                 Console.ReadLine();

@@ -5,6 +5,7 @@
     <AssemblyName>dnt</AssemblyName>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Version>1.0.8</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Dnt\*.cs">
