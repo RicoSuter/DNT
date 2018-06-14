@@ -1,23 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <IsPackable>true</IsPackable>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>dnt</AssemblyName>
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Rico Suter</Authors>
-    <Company>Rico Suter</Company>
-    <Product>DotNetTools (DNT)</Product>
-    <Version>1.0.7</Version>
-    <PackageId>DNT</PackageId>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <PackAsTool>true</PackAsTool>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Dnt\*.cs">
+      <Link>%(RecursiveDir)\%(FileName)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <OutputPath>..\Dnt.Npm\bin\binaries\NetCore21</OutputPath>
+    <OutputPath>..\Dnt.Npm\bin\binaries\Win</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />
