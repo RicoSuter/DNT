@@ -71,16 +71,16 @@ dnt update-packages PackagesToUpdate [TargetPackageVersion] [/path:ProjectDirect
 
 **Samples:**
 
-Update the `Newtonsoft.Json` packages in the selected projects to version `10.0.1`:
-
-```
-dnt update-packages Newtonsoft.Json 10.0.1
-```
-
 Update all packages in the selected projects to the latest version:
 
 ```
 dnt update-packages *
+```
+
+Update the `Newtonsoft.Json` packages in the selected projects to version `10.0.1`:
+
+```
+dnt update-packages Newtonsoft.Json 10.0.1
 ```
 
 Update all packages which start with `MyPackages.` to version `2.1.0` in the selected projects:
@@ -96,12 +96,13 @@ Increases or changes the package version of the selected projects.
 **Command:**
 
 ```
-dnt bump-version major|minor|patch [/major:number] [/minor:number] [/patch:number] [/path:ProjectDirectoryPath]
+dnt bump-version major|minor|patch|revision [number]
 ```
 
 **Parameters:**
 
-TBD
+- Action: Specifies the version segment to bump (major|minor|patch|revision) by 1 or by the specified number
+- Number: The version to bump up to (if not specified: Increase by 1)
 
 **Samples:**
 
@@ -114,7 +115,7 @@ dnt bump-version minor
 Set the patch version of all selected projects to 18:
 
 ```
-dnt bump-version patch /patch:18
+dnt bump-version patch 18
 ```
 
 ### switch-to-projects
