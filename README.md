@@ -89,7 +89,7 @@ Update all packages which start with `MyPackages.` to version `2.1.0` in the sel
 dnt update-packages MyPackages.* 2.1.0
 ```
 
-### bump-version
+### bump-versions
 
 Increases or changes the package version of the selected projects.
 
