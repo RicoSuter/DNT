@@ -10,17 +10,11 @@ namespace Dnt.Commands.Projects
                                                    "Only projects with GeneratePackageOnBuild set are being processed.")]
     public class BumpVersionsCommand : ProjectCommandBase
     {
-        [Argument(Position = 1, Description = "The version part to update (major|minor|patch).", IsRequired = true)]
+        [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision).", IsRequired = true)]
         public string Action { get; set; }
 
-        [Argument(Name = nameof(Major), Description = "The forced major version.", IsRequired = false)]
-        public int Major { get; set; } = -1;
-
-        [Argument(Name = nameof(Minor), Description = "The forced minor version.", IsRequired = false)]
-        public int Minor { get; set; } = -1;
-
-        [Argument(Name = nameof(Patch), Description = "The forced patch version.", IsRequired = false)]
-        public int Patch { get; set; } = -1;
+        [Argument(Position = 2, Description = "The specified version number of the given action.", IsRequired = false)]
+        public int Number { get; set; } = -1;
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
@@ -81,21 +75,19 @@ namespace Dnt.Commands.Projects
 
             if (Action == "major")
             {
-                return (Major == -1 ? int.Parse(segments[0]) + 1 : Major) + "." +
-                       (Minor == -1 ? "0" : Minor.ToString()) + "." +
-                       (Patch == -1 ? "0" : Patch.ToString());
+                return $"{(Number != -1 ? Number : int.Parse(segments[0]) + 1)}.0.0{(segments.Length >= 4 ? ".0" : "")}";
             }
             else if (Action == "minor")
             {
-                return (Major == -1 ? segments[0] : Major.ToString()) + "." +
-                       (Minor == -1 ? int.Parse(segments[1]) + 1 : Minor) + "." +
-                       (Patch == -1 ? "0" : Patch.ToString());
+                return $"{segments[0]}.{(Number != -1 ? Number : int.Parse(segments[1]) + 1)}.0{(segments.Length >= 4 ? ".0" : "")}";
+            }
+            else if (Action == "patch")
+            {
+                return $"{segments[0]}.{segments[1]}.{(Number != -1 ? Number : int.Parse(segments[2]) + 1)}{(segments.Length >= 4 ? ".0" : "")}";
             }
             else
             {
-                return (Major == -1 ? segments[0] : Major.ToString()) + "." +
-                       (Minor == -1 ? segments[1] : Minor.ToString()) + "." +
-                       (Patch == -1 ? int.Parse(segments[2]) + 1 : Patch);
+                return $"{segments[0]}.{segments[1]}.{segments[2]}.{(Number != -1 ? Number : (segments.Length >= 4 ? int.Parse(segments[3]) + 1 : 1))}";
             }
         }
     }
