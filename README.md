@@ -12,7 +12,7 @@ Globally install via NPM (.NET 4.6.2 and .NET Core 2.1+)
 npm i -g dotnettools
 ```
 
-Install .NET Core global tool (.NET Core 2.1+ only, not working yet): 
+Install .NET Core global tool (.NET Core 2.1+ only, **referenced MSBuild package seems to be broken in the .NET Core version**): 
 
 ```
 dotnet tool install -g dnt
