@@ -170,3 +170,7 @@ dnt switch-to-packages njs-switch.dnt
 ### create-solution
 
 TBD
+
+# DNT developement and testing
+
+It is recommended to add the debug output path "DNT/src/Dnt.NetFx/bin/Debug" to the Path environment variable, or directly start the app with a command.
