@@ -21,8 +21,8 @@ npm i -g dotnettools
 Uninstall 
 
 ```
-npm uninstall -g dotnettools
 dotnet tool uninstall -g dnt
+npm uninstall -g dotnettools
 ```
 
 ## Package Commands
