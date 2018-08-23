@@ -12,7 +12,7 @@ Globally install via NPM (.NET 4.6.2 and .NET Core 2.1+)
 npm i -g dotnettools
 ```
 
-Install .NET Core global tool (.NET Core 2.1+ only, not working yet): 
+Install .NET Core global tool (.NET Core 2.1+ only, **referenced Microsoft.Build package seems to be broken in the .NET Core version and cannot load projects, see [issue #5](https://github.com/RSuter/DNT/issues/5)**): 
 
 ```
 dotnet tool install -g dnt
@@ -71,16 +71,16 @@ dnt update-packages PackagesToUpdate [TargetPackageVersion] [/path:ProjectDirect
 
 **Samples:**
 
-Update the `Newtonsoft.Json` packages in the selected projects to version `10.0.1`:
-
-```
-dnt update-packages Newtonsoft.Json 10.0.1
-```
-
 Update all packages in the selected projects to the latest version:
 
 ```
 dnt update-packages *
+```
+
+Update the `Newtonsoft.Json` packages in the selected projects to version `10.0.1`:
+
+```
+dnt update-packages Newtonsoft.Json 10.0.1
 ```
 
 Update all packages which start with `MyPackages.` to version `2.1.0` in the selected projects:
@@ -89,19 +89,20 @@ Update all packages which start with `MyPackages.` to version `2.1.0` in the sel
 dnt update-packages MyPackages.* 2.1.0
 ```
 
-### bump-version
+### bump-versions
 
 Increases or changes the package version of the selected projects.
 
 **Command:**
 
 ```
-dnt bump-version major|minor|patch [/major:number] [/minor:number] [/patch:number] [/path:ProjectDirectoryPath]
+dnt bump-version major|minor|patch|revision [number]
 ```
 
 **Parameters:**
 
-TBD
+- Action: Specifies the version segment to bump (major|minor|patch|revision) by 1 or by the specified number
+- Number: The version to bump up to (if not specified: Increase by 1)
 
 **Samples:**
 
@@ -114,7 +115,7 @@ dnt bump-version minor
 Set the patch version of all selected projects to 18:
 
 ```
-dnt bump-version patch /patch:18
+dnt bump-version patch 18
 ```
 
 ### switch-to-projects
