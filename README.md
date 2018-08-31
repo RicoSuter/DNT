@@ -109,13 +109,13 @@ dnt bump-version major|minor|patch|revision [number]
 Bump the minor version of all selected projects by 1:
 
 ```
-dnt bump-version minor
+dnt bump-versions minor
 ```
 
 Set the patch version of all selected projects to 18:
 
 ```
-dnt bump-version patch 18
+dnt bump-versions patch 18
 ```
 
 ### switch-to-projects
