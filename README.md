@@ -160,10 +160,11 @@ Now all NJsonSchema package references in the NSwag solution are now replaced by
 
 ### switch-to-packages
 
-After implementing and testing, switch back to NuGet references: 
+After implementing and testing, switch back to NuGet references and update to the latest version: 
 
 ```
 dnt switch-to-packages njs-switch.dnt
+dnt update-packages NJsonSchema*
 ```
 
 ## Solution Commands
