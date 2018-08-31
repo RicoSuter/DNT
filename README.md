@@ -120,11 +120,11 @@ dnt bump-version patch 18
 
 ### switch-to-projects
 
-Switches from NuGet package references to local project references for refactorings, debugging, etc.
+This command automatically switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
 
-Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
+#### Usage
 
 Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
 
