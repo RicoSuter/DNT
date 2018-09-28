@@ -31,6 +31,10 @@ dotnet tool uninstall -g dnt
 npm uninstall -g dotnettools
 ```
 
+- [Package Commands](#package-commands)
+- [Project Commands](#project-commands)
+- [Solution Commands](#solution-commands)
+
 ## Package Commands
 
 By default, all commands search in the current directory for all `*.csproj` files and apply the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
