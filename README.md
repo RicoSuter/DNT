@@ -118,6 +118,20 @@ Set the patch version of all selected projects to 18:
 dnt bump-version patch 18
 ```
 
+### enable
+
+Enables a project feature in all selected projects.
+
+**Command:**
+
+```
+dnt enable warnaserror|xmldocs
+```
+
+**Parameters:**
+
+- Action: Specifies the feature to enable (warnaserror|xmldocs)
+
 ### switch-to-projects
 
 Switches from NuGet package references to local project references for refactorings, debugging, etc.
