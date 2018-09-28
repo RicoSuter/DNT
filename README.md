@@ -31,6 +31,8 @@ dotnet tool uninstall -g dnt
 npm uninstall -g dotnettools
 ```
 
+Available commands:
+
 - [Package Commands](#package-commands)
 - [Project Commands](#project-commands)
 - [Solution Commands](#solution-commands)
