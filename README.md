@@ -12,6 +12,12 @@ Install .NET Core global tool (.NET Core 2.1+ only):
 dotnet tool install -g dnt
 ```
 
+Update the global tool:
+
+```
+dotnet tool update -g dnt
+```
+
 Globally install via NPM (.NET 4.6.2+ and .NET Core 2.1+)
 
 ```
