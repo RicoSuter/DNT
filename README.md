@@ -124,20 +124,6 @@ Set the patch version of all selected projects to 18:
 dnt bump-versions patch 18
 ```
 
-### enable
-
-Enables a project feature in all selected projects.
-
-**Command:**
-
-```
-dnt enable warnaserror|xmldocs
-```
-
-**Parameters:**
-
-- Action: Specifies the feature to enable (warnaserror|xmldocs)
-
 ### switch-to-projects
 
 This command automatically switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
@@ -186,6 +172,22 @@ After implementing and testing, switch back to NuGet references and update to th
 dnt switch-to-packages njs-switch.dnt
 dnt update-packages NJsonSchema*
 ```
+
+## Project Commands
+
+### enable
+
+Enables a project feature in all selected projects.
+
+**Command:**
+
+```
+dnt enable warnaserror|xmldocs
+```
+
+**Parameters:**
+
+- Action: Specifies the feature to enable (warnaserror|xmldocs)
 
 ## Solution Commands
 
