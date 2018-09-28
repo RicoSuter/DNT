@@ -28,7 +28,7 @@ namespace Dnt.Commands.Projects
                     {
                         var versions = BumpVersion(project, "Version", "1.0.0");
 
-                        host.WriteMessage("Bumped version of " + System.IO.Path.GetFileName(projectPath) +
+                        host.WriteMessage("[x] Bumped version of " + System.IO.Path.GetFileName(projectPath) +
                                           " from " + versions.Item2 +
                                           " to " + versions.Item1 + "\n");
 
@@ -41,7 +41,7 @@ namespace Dnt.Commands.Projects
                     }
                     else
                     {
-                        host.WriteMessage("Ignoring " + System.IO.Path.GetFileName(projectPath) + ": Not GeneratePackageOnBuild\n");
+                        host.WriteMessage("[ ] Ignoring " + System.IO.Path.GetFileName(projectPath) + ": Not GeneratePackageOnBuild\n");
                     }
                 }
                 catch (Exception e)
