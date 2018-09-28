@@ -4,7 +4,7 @@
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
-**Experimental: Command and parameter names may change**
+**Experimental: Command and parameter names may change. Please create issues or PRs if you'd like to fix or change something.**
 
 Install .NET Core global tool (.NET Core 2.1+ only): 
 
@@ -12,7 +12,7 @@ Install .NET Core global tool (.NET Core 2.1+ only):
 dotnet tool install -g dnt
 ```
 
-Globally install via NPM (.NET 4.6.2 and .NET Core 2.1+)
+Globally install via NPM (.NET 4.6.2+ and .NET Core 2.1+)
 
 ```
 npm i -g dotnettools
@@ -109,13 +109,13 @@ dnt bump-version major|minor|patch|revision [number]
 Bump the minor version of all selected projects by 1:
 
 ```
-dnt bump-version minor
+dnt bump-versions minor
 ```
 
 Set the patch version of all selected projects to 18:
 
 ```
-dnt bump-version patch 18
+dnt bump-versions patch 18
 ```
 
 ### enable
@@ -134,15 +134,15 @@ dnt enable warnaserror|xmldocs
 
 ### switch-to-projects
 
-Switches from NuGet package references to local project references for refactorings, debugging, etc.
+This command automatically switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
 
-Idea: https://github.com/rsuter/NuGetReferenceSwitcher/wiki/Guide
+#### Usage
 
 Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
 
-(here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution)
+**Sample:** Here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution: 
 
 ```json
 {
@@ -174,10 +174,11 @@ Now all NJsonSchema package references in the NSwag solution are now replaced by
 
 ### switch-to-packages
 
-After implementing and testing, switch back to NuGet references: 
+After implementing and testing, switch back to NuGet references and update to the latest version: 
 
 ```
 dnt switch-to-packages njs-switch.dnt
+dnt update-packages NJsonSchema*
 ```
 
 ## Solution Commands
