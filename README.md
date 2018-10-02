@@ -195,6 +195,14 @@ dnt enable warnaserror|xmldocs
 
 - Action: Specifies the feature to enable (warnaserror|xmldocs)
 
+**Samples:**
+
+Handle all warnings as errors in all selected projects: 
+
+```
+dnt enable warnaserror
+```
+
 ## Solution Commands
 
 ### create-solution
