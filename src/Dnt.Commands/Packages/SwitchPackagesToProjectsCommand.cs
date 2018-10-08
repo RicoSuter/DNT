@@ -81,7 +81,7 @@ namespace Dnt.Commands.Packages
                         using (var collection = new ProjectCollection())
                         {
                             var project = collection.LoadProject(solutionProject.AbsolutePath);
-                            var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
+                            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
 
                             foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference").ToList())
                             {
