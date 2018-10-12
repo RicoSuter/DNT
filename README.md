@@ -134,7 +134,7 @@ dnt bump-versions patch 18
 
 ### switch-to-projects
 
-This command automatically switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
+This command switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
 
@@ -170,7 +170,7 @@ Then switch to projects in the solution:
 dnt switch-to-projects njs-switch.dnt
 ```
 
-Now all NJsonSchema package references in the NSwag solution are now replaced by local project references and the NJsonSchema projects added to the solution.
+Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
 
 ### switch-to-packages
 
