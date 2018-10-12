@@ -110,7 +110,7 @@ Increases or changes the package version of the selected projects.
 **Command:**
 
 ```
-dnt bump-version major|minor|patch|revision [number]
+dnt bump-versions major|minor|patch|revision [number]
 ```
 
 **Parameters:**
