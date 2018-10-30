@@ -32,6 +32,7 @@ namespace Dnt.Commands.Packages
         private void SwitchToPackages(IConsoleHost host, ReferenceSwitcherConfiguration configuration)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
+            var mappedProjectFilePaths = configuration.Mappings.Select(m => Path.GetFileName(m.Value.ActualPath)).ToList();
 
             foreach (var mapping in configuration.Mappings)
             {
@@ -39,7 +40,7 @@ namespace Dnt.Commands.Packages
                 var packageName = mapping.Key;
                 var packageVersion = mapping.Value.Version;
 
-                var switchedProjects = SwitchToPackage(solution, projectPath, packageName, packageVersion, host);
+                var switchedProjects = SwitchToPackage(solution, projectPath, packageName, packageVersion, mappedProjectFilePaths, host);
                 foreach (var s in switchedProjects)
                 {
                     host.WriteMessage(Path.GetFileName(s) + ": \n");
@@ -67,7 +68,8 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private IReadOnlyList<string> SwitchToPackage(SolutionFile solution, string projectPath, string packageName, string packageVersion, IConsoleHost host)
+        private IReadOnlyList<string> SwitchToPackage(SolutionFile solution, string projectPath,
+            string packageName, string packageVersion, List<string> mappedProjectFilePaths, IConsoleHost host)
         {
             var switchedProjects = new List<string>();
             var absoluteProjectPath = PathUtilities.ToAbsolutePath(projectPath, Directory.GetCurrentDirectory());
@@ -82,25 +84,29 @@ namespace Dnt.Commands.Packages
                         using (var collection = new ProjectCollection())
                         {
                             var project = collection.LoadProject(solutionProject.AbsolutePath);
+                            var projectFileName = Path.GetFileName(solutionProject.AbsolutePath);
                             var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
 
-                            var count = 0;
-                            foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
+                            if (!mappedProjectFilePaths.Contains(projectFileName)) // do not modify mapped projects
                             {
-                                var absoluteProjectReferencePath = PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
-                                if (absoluteProjectReferencePath == absoluteProjectPath)
+                                var count = 0;
+                                foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
                                 {
-                                    project.RemoveItem(item);
-                                    project.AddItem("PackageReference", packageName, new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+                                    var absoluteProjectReferencePath = PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
+                                    if (absoluteProjectReferencePath == absoluteProjectPath)
+                                    {
+                                        project.RemoveItem(item);
+                                        project.AddItem("PackageReference", packageName, new[] { new KeyValuePair<string, string>("Version", packageVersion) });
 
-                                    switchedProjects.Add(solutionProject.AbsolutePath);
-                                    count++;
+                                        switchedProjects.Add(solutionProject.AbsolutePath);
+                                        count++;
+                                    }
                                 }
-                            }
 
-                            if (count > 0)
-                            {
-                                project.Save();
+                                if (count > 0)
+                                {
+                                    project.Save();
+                                }
                             }
                         }
                     }
