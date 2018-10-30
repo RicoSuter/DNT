@@ -35,7 +35,7 @@ namespace Dnt.Commands.Packages
             var projects = new List<string>();
             foreach (var mapping in configuration.Mappings)
             {
-                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key))
+                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
                 {
                     projects.Add("\"" + mapping.Value.ActualPath + "\"");
                 }

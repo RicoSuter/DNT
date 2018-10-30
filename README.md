@@ -31,13 +31,7 @@ dotnet tool uninstall -g dnt
 npm uninstall -g dotnettools
 ```
 
-Available commands:
-
-- [Package Commands](#package-commands)
-- [Project Commands](#project-commands)
-- [Solution Commands](#solution-commands)
-
-## Package Commands
+## Usage
 
 By default, all commands search in the current directory for all `*.csproj` files and apply the command to all of them. The targeted projects or solutions can be changed with the `/path:MyProject.csproj` parameter.
 
@@ -48,6 +42,14 @@ dnt list-projects
 
 dnt list-projects /path:MySolution.sln
 ```
+
+Available commands:
+
+- [Package Commands](#package-commands)
+- [Project Commands](#project-commands)
+- [Solution Commands](#solution-commands)
+
+## Package Commands
 
 ### install-packages
 
@@ -108,7 +110,7 @@ Increases or changes the package version of the selected projects.
 **Command:**
 
 ```
-dnt bump-version major|minor|patch|revision [number]
+dnt bump-versions major|minor|patch|revision [number]
 ```
 
 **Parameters:**
@@ -132,7 +134,7 @@ dnt bump-versions patch 18
 
 ### switch-to-projects
 
-This command automatically switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
+This command switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
 This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
 
@@ -168,7 +170,7 @@ Then switch to projects in the solution:
 dnt switch-to-projects njs-switch.dnt
 ```
 
-Now all NJsonSchema package references in the NSwag solution are now replaced by local project references and the NJsonSchema projects added to the solution.
+Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
 
 ### switch-to-packages
 
