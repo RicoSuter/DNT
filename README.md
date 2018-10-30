@@ -181,6 +181,12 @@ dnt switch-to-packages njs-switch.dnt
 dnt update-packages NJsonSchema*
 ```
 
+### used-packages
+
+Lists all used packages, transitive packages in the projects and their licenses.
+
+TODO: Add parameters/samples
+
 ## Project Commands
 
 ### enable
