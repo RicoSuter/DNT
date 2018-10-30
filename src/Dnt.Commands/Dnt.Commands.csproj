@@ -7,7 +7,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <PackageId>DNT.Commands</PackageId>
-    <Version>1.0.13</Version>
+    <Version>1.0.14</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="15.8.166" />
