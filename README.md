@@ -185,6 +185,12 @@ dnt update-packages NJsonSchema*
 
 Lists all used packages, transitive packages in the projects and their licenses.
 
+**Parameters:**
+
+- ExcludeMicrosoft (default: true): Exclude packages which start with Microsoft.*
+- ExcludeSystem (default: true): Exclude packages which start with System.*
+- IncludeTransitiveDependencies (default: true): Also analyze transitive dependencies (i.e. indirectly referenced packages)
+
 Sample output for [NJsonSchema](http://njsonschema.org):
 
 ```
