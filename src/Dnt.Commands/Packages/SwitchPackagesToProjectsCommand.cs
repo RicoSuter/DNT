@@ -47,7 +47,7 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
+        private static void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             foreach (var mapping in configuration.Mappings)
@@ -55,7 +55,7 @@ namespace Dnt.Commands.Packages
                 var packageName = mapping.Key;
                 var projectPath = mapping.Value.ActualPath;
 
-                var switchedProjects = SwitchToProject(solution, packageName, projectPath, host);
+                var switchedProjects = SwitchToProject(mapping.Value, solution, packageName, projectPath, host);
                 foreach (var s in switchedProjects)
                 {
                     host.WriteMessage(Path.GetFileName(s.Key) + ": \n");
@@ -69,7 +69,7 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private IReadOnlyDictionary<string, string> SwitchToProject(SolutionFile solution, string packageName, string projectPath, IConsoleHost host)
+        private static IReadOnlyDictionary<string, string> SwitchToProject(ProjectMapping mapping, SolutionFile solution, string packageName, string projectPath, IConsoleHost host)
         {
             var switchedProjects = new Dictionary<string, string>();
             foreach (var solutionProject in solution.ProjectsInOrder)
@@ -78,26 +78,30 @@ namespace Dnt.Commands.Packages
                 {
                     try
                     {
-                        using (var collection = new ProjectCollection())
+                        var projectInformation = ProjectExtensions.GetProject(solutionProject.AbsolutePath);
+                        var project = projectInformation.Project;
+                        
+                        var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
+
+                        foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
                         {
-                            var project = collection.LoadProject(solutionProject.AbsolutePath);
-                            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
+                            var packageReference = item.EvaluatedInclude.Split(',').First().Trim();
 
-                            foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference").ToList())
+
+                            if (packageReference == packageName)
                             {
-                                var packageReference = item.EvaluatedInclude;
-                                if (packageReference == packageName)
-                                {
-                                    project.RemoveItem(item);
-                                    project.AddItem("ProjectReference", PathUtilities.ToRelativePath(projectPath, projectDirectory));
+                                project.RemoveItem(item);
+                                project.AddItem("ProjectReference", PathUtilities.ToRelativePath(projectPath, projectDirectory));
 
-                                    var version = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Any";
-                                    switchedProjects[solutionProject.AbsolutePath] = version;
-                                }
+                                if (projectInformation.IsLegacyProject)
+                                    SetLegacyReference(mapping, item, project.FullPath);
+                                  
+                                var version = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Any";
+                                switchedProjects[solutionProject.AbsolutePath] = version;
                             }
-
-                            project.Save();
                         }
+
+                        project.Save();
                     }
                     catch (Exception e)
                     {
@@ -108,5 +112,35 @@ namespace Dnt.Commands.Packages
 
             return switchedProjects;
         }
+
+        private static void SetLegacyReference(ProjectMapping mapping, ProjectItem item, string projectFullPath)
+        {
+            var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
+
+            var legacyProject =
+                (from m in mapping.LegacyProjects
+                    where string.Equals(m.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                    select m).FirstOrDefault();
+
+            if (legacyProject is null)
+            {
+                legacyProject = new LegacyProject
+                {
+                    LegacyReference = new LegacyReference
+                    {
+                        Include = item.EvaluatedInclude
+                    },
+                    Name = projectName
+                };
+                
+                mapping.LegacyProjects.Add(legacyProject);
+            }
+
+            foreach (var metadata in item.Metadata)
+            {
+                legacyProject.LegacyReference.Metadata.Add(new KeyValuePair<string, string>(metadata.Name, metadata.EvaluatedValue));
+            }
+        }
+
     }
 }
