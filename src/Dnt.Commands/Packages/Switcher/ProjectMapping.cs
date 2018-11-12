@@ -9,8 +9,8 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("legacyReference")]
-        public LegacyReference LegacyReference { get; set; }
+        [JsonProperty("reference")]
+        public LegacyReference Reference { get; set; }
 
     }
 

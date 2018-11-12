@@ -35,7 +35,7 @@ namespace Dnt.Commands.Packages
             var projects = new List<string>();
             foreach (var mapping in configuration.Mappings)
             {
-                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key))
+                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
                 {
                     projects.Add("\"" + mapping.Value.ActualPath + "\"");
                 }
@@ -80,14 +80,12 @@ namespace Dnt.Commands.Packages
                     {
                         var projectInformation = ProjectExtensions.GetProject(solutionProject.AbsolutePath);
                         var project = projectInformation.Project;
-                        
                         var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
 
                         foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
                         {
                             var packageReference = item.EvaluatedInclude.Split(',').First().Trim();
-
-
+                            
                             if (packageReference == packageName)
                             {
                                 project.RemoveItem(item);
@@ -126,7 +124,7 @@ namespace Dnt.Commands.Packages
             {
                 legacyProject = new LegacyProject
                 {
-                    LegacyReference = new LegacyReference
+                    Reference = new LegacyReference
                     {
                         Include = item.EvaluatedInclude
                     },
@@ -138,7 +136,7 @@ namespace Dnt.Commands.Packages
 
             foreach (var metadata in item.Metadata)
             {
-                legacyProject.LegacyReference.Metadata.Add(new KeyValuePair<string, string>(metadata.Name, metadata.EvaluatedValue));
+                legacyProject.Reference.Metadata.Add(new KeyValuePair<string, string>(metadata.Name, metadata.EvaluatedValue));
             }
         }
 
