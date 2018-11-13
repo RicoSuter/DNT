@@ -88,19 +88,13 @@ namespace Dnt.Commands.Packages
 
                             if (packageReference == packageName)
                             {
-                                var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Any";
+                                var isPackageReference = (item.ItemType == "PackageReference");
+                                var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
 
                                 project.RemoveItem(item);
                                 project.AddItem("ProjectReference", PathUtilities.ToRelativePath(projectPath, projectDirectory));
 
-                                if (projectInformation.IsLegacyProject)
-                                {
-                                    SetLegacyReference(configuration, item, project.FullPath, packageName);
-                                }
-                                else
-                                {
-                                    SetSdkReference(configuration, project.FullPath, packageName, packageVersion);
-                                }
+                                SetSwitchedProjectInformation(configuration, item, project.FullPath, isPackageReference, packageName, packageVersion);
 
                                 switchedProjects[solutionProject.AbsolutePath] = packageVersion;
                             }
@@ -118,67 +112,53 @@ namespace Dnt.Commands.Packages
             return switchedProjects;
         }
 
-        private static void SetLegacyReference(ReferenceSwitcherConfiguration configuration, ProjectItem item, string projectFullPath, string packageName)
+        private static void SetSwitchedProjectInformation(ReferenceSwitcherConfiguration configuration, ProjectItem item, string projectFullPath, bool isPackageReference, string packageName, string packageVersion)
         {
             var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
 
-            var legacyProject =
-                (from m in configuration.LegacyProjects
+            var switchedProject =
+                (from m in configuration.SwitchedProjects
                  where string.Equals(m.Name, projectName, StringComparison.OrdinalIgnoreCase)
                  select m).FirstOrDefault();
 
-            if (legacyProject is null)
+            if (switchedProject is null)
             {
-                legacyProject = new LegacyProject { Name = projectName };
-                configuration.LegacyProjects.Add(legacyProject);
+                switchedProject = new SwitchedProject { Name = projectName };
+                configuration.SwitchedProjects.Add(switchedProject);
             }
 
-            var legacyReference = (
-                from r in legacyProject.References
-                where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
-                select r).FirstOrDefault();
+            SwitchedPackage switchedPackage = null;
 
-            if (legacyReference is null)
+            if (switchedProject.Packages != null)
             {
-                legacyReference = new LegacyReference() { Include = item.EvaluatedInclude };
-                legacyProject.References.Add(legacyReference);
+                switchedPackage = (
+                    from r in switchedProject.Packages
+                    where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
+                    select r).FirstOrDefault();
+            }
+            else
+            {
+                switchedProject.Packages = new List<SwitchedPackage>();
             }
 
-            foreach (var metadata in item.Metadata)
+            if (switchedPackage is null)
             {
-                legacyReference.Metadata.Add(new KeyValuePair<string, string>(metadata.Name, metadata.EvaluatedValue));
+                switchedPackage = new SwitchedPackage();
+                switchedProject.Packages.Add(switchedPackage);
             }
+
+            if (!isPackageReference)
+            {
+                switchedPackage.Include = item.EvaluatedInclude;
+
+                foreach (var metadata in item.Metadata)
+                {
+                    switchedPackage.Metadata.Add(new KeyValuePair<string, string>(metadata.Name, metadata.EvaluatedValue));
+                }
+            }
+
+            switchedPackage.PackageName = packageName;
+            switchedPackage.PackageVersion = packageVersion;
         }
-
-        private static void SetSdkReference(ReferenceSwitcherConfiguration configuration, string projectFullPath, string packageName, string packageVersion)
-        {
-            var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
-
-            var project =
-                (from m in configuration.SdkProjects
-                 where string.Equals(m.Name, projectName, StringComparison.OrdinalIgnoreCase)
-                 select m).FirstOrDefault();
-
-            if (project is null)
-            {
-                project = new SdkProject { Name = projectName };
-                configuration.SdkProjects.Add(project);
-            }
-
-            var mappedPackage = (
-                from r in project.MappedPackages
-                where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
-                select r).FirstOrDefault();
-
-            if (mappedPackage is null)
-            {
-                mappedPackage = new MappedPackage();
-                project.MappedPackages.Add(mappedPackage);
-            }
-
-            mappedPackage.PackageName = packageName;
-            mappedPackage.Version = packageVersion;
-        }
-
     }
 }

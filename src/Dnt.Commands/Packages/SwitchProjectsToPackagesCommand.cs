@@ -97,18 +97,10 @@ namespace Dnt.Commands.Packages
                                 if (absoluteProjectReferencePath == absoluteProjectPath)
                                 {
                                     project.RemoveItem(item);
-
-                                    if (projectInformation.IsLegacyProject)
-                                    {
-                                        AddLegacyReference(configuration, solutionProject, project, packageName);
-                                    }
-                                    else
-                                    {
-                                        var packageVersion = GetPackageVersion(configuration, solutionProject.AbsolutePath, packageName, defaultPackageVersion);
-
-                                        AddSdkPackage(project, packageName, packageVersion);
-                                    }
-
+                                    
+                                    var packageVersion = GetPackageVersion(configuration, solutionProject.AbsolutePath, packageName, defaultPackageVersion);
+                                    AddPackage(configuration, solutionProject, project, packageName, packageVersion);
+                                    
                                     switchedProjects.Add(solutionProject.AbsolutePath);
                                     count++;
                                 }
@@ -131,27 +123,31 @@ namespace Dnt.Commands.Packages
             return switchedProjects;
         }
 
-        private static void AddLegacyReference(ReferenceSwitcherConfiguration configuration, ProjectInSolution solutionProject, Project project, string packageName)
+        private static void AddPackage(ReferenceSwitcherConfiguration configuration, ProjectInSolution solutionProject, Project project, string packageName, string packageVersion)
         {
             var projectName =
                 Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
 
-            var legacyProject = (
-                from r in configuration.LegacyProjects
+            var switchedProject = (
+                from r in configuration.SwitchedProjects
                 where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
                 select r).FirstOrDefault();
 
-            if (legacyProject != null)
+            if (switchedProject != null)
             {
-                var reference = legacyProject.GetReference(packageName);
-                project.AddItem("Reference", reference.Include, reference.Metadata);
-            }
-        }
+                var reference = switchedProject.GetSwitchedPackage(packageName);
 
-        private static void AddSdkPackage(Project project, string packageName, string packageVersion)
-        {
-            project.AddItem("PackageReference", packageName,
-                new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+                if (!string.IsNullOrEmpty(reference.Include))
+                {
+                    project.AddItem("Reference", reference.Include, reference.Metadata);
+                }
+                else
+                {
+                    project.AddItem("PackageReference", packageName,
+                        new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+                }
+
+            }
         }
 
         private static string GetPackageVersion(ReferenceSwitcherConfiguration configuration, string projectFullPath, string packageName, string defaultPackageVersion)
@@ -159,17 +155,17 @@ namespace Dnt.Commands.Packages
             var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
             string result = null;
 
-            var mappedProject = (
-                from p in configuration.SdkProjects
+            var switchedProject = (
+                from p in configuration.SwitchedProjects
                 where string.Equals(p.Name, projectName, StringComparison.OrdinalIgnoreCase)
                 select p).FirstOrDefault();
 
-            if (mappedProject != null)
+            if (switchedProject != null)
             {
                 result = (
-                    from m in mappedProject.MappedPackages
+                    from m in switchedProject.Packages
                     where string.Equals(m.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
-                    select m.Version
+                    select m.PackageVersion
                     ).FirstOrDefault();
             }
 

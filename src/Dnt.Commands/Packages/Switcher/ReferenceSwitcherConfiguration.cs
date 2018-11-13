@@ -16,11 +16,8 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("mappings")]
         public Dictionary<string, ProjectMapping> Mappings { get; } = new Dictionary<string, ProjectMapping>();
 
-        [JsonProperty("legacyProjects")]
-        public List<LegacyProject> LegacyProjects { get; set; } = new List<LegacyProject>();
-
-        [JsonProperty("sdkProjects")]
-        public List<SdkProject> SdkProjects { get; set; } = new List<SdkProject>();
+        [JsonProperty("projects")]
+        public List<SwitchedProject> SwitchedProjects { get; set; } = new List<SwitchedProject>();
 
         [JsonIgnore]
         public string ActualSolution => PathUtilities.ToAbsolutePath(Solution, System.IO.Path.GetDirectoryName(Path));
