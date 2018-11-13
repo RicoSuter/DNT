@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dnt.Commands.Infrastructure;
 using Newtonsoft.Json;
 
@@ -9,27 +11,51 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("reference")]
-        public LegacyReference Reference { get; set; }
+        [JsonProperty("references")]
+        public List<LegacyReference> References { get; set; }
+
+        public LegacyReference GetReference(string packageName)
+        {
+            return (
+                from r in References
+                where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
+                select r).FirstOrDefault();
+        }
 
     }
 
     public class LegacyReference
     {
+        [JsonProperty("packageName")]
+        public string PackageName { get; set; }
+
         [JsonProperty("include")]
         public string Include { get; set; }
 
         [JsonProperty("metadata")]
         public List<KeyValuePair<string, string>> Metadata { get; set; } = new List<KeyValuePair<string, string>>();
+    }
 
+    public class SdkProject
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        public List<MappedPackage> MappedPackage { get; set; } = new List<MappedPackage>();
+    }
+
+    public class MappedPackage
+    {
+        [JsonProperty("packageName")]
+        public string PackageName { get; set; }
+
+        [JsonProperty("version")]
+        public string Version { get; set; }
     }
 
     public class ProjectMapping
     {
         internal ReferenceSwitcherConfiguration Parent { get; set; }
-
-        [JsonProperty("legacyProjects")]
-        public List<LegacyProject> LegacyProjects { get; set; } = new List<LegacyProject>();
 
         [JsonProperty("version")]
         public string Version { get; set; }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
 using Microsoft.Build.Construction;
+using Microsoft.Build.Evaluation;
 using NConsole;
 
 namespace Dnt.Commands.Packages
@@ -39,7 +40,7 @@ namespace Dnt.Commands.Packages
                 var packageName = mapping.Key;
                 var packageVersion = mapping.Value.Version;
 
-                var switchedProjects = SwitchToPackage(mapping.Value, solution, projectPath, packageName, packageVersion, mappedProjectFilePaths, host);
+                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, packageVersion, mappedProjectFilePaths, host);
                 foreach (var s in switchedProjects)
                 {
                     host.WriteMessage(Path.GetFileName(s) + ": \n");
@@ -68,7 +69,7 @@ namespace Dnt.Commands.Packages
         }
 
         private static IReadOnlyList<string> SwitchToPackage(
-            ProjectMapping mapping, SolutionFile solution, string projectPath,
+            ReferenceSwitcherConfiguration configuration, SolutionFile solution, string projectPath,
             string packageName, string packageVersion, List<string> mappedProjectFilePaths, IConsoleHost host)
         {
             var switchedProjects = new List<string>();
@@ -99,19 +100,11 @@ namespace Dnt.Commands.Packages
 
                                     if (projectInformation.IsLegacyProject)
                                     {
-                                        var projectName =
-                                            Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
-
-                                        var legacyProject =
-                                            (from r in mapping.LegacyProjects where r.Name == projectName select r)
-                                            .FirstOrDefault();
-                                        project.AddItem("Reference", legacyProject.Reference.Include,
-                                            legacyProject.Reference.Metadata);
+                                        AddLegacyReference(configuration, solutionProject, project, packageName);
                                     }
                                     else
                                     {
-                                        project.AddItem("PackageReference", packageName,
-                                            new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+                                        AddSdkPackage(project, packageName, packageVersion);
                                     }
 
                                     switchedProjects.Add(solutionProject.AbsolutePath);
@@ -135,5 +128,32 @@ namespace Dnt.Commands.Packages
 
             return switchedProjects;
         }
+
+        private static void AddLegacyReference(ReferenceSwitcherConfiguration configuration, ProjectInSolution solutionProject, Project project, string packageName)
+        {
+            var projectName =
+                Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
+
+            var legacyProject = (
+                from r in configuration.LegacyProjects
+                where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                select r).FirstOrDefault();
+
+            if (legacyProject != null)
+            {
+                var reference = legacyProject.GetReference(packageName);
+                project.AddItem(
+                    "Reference",
+                    reference.Include,
+                    reference.Metadata);
+            }
+        }
+
+        private static void AddSdkPackage(Project project, string packageName, string packageVersion)
+        {
+            project.AddItem("PackageReference", packageName,
+                new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+        }
+
     }
 }
