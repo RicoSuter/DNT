@@ -92,7 +92,7 @@ namespace Dnt.Commands.Packages
 
                                 project.RemoveItem(item);
                                 project.AddItem("ProjectReference", PathUtilities.ToRelativePath(projectPath, projectDirectory));
-                                
+
                                 if (projectInformation.IsLegacyProject)
                                 {
                                     SetLegacyReference(configuration, item, project.FullPath, packageName);
@@ -166,14 +166,14 @@ namespace Dnt.Commands.Packages
             }
 
             var mappedPackage = (
-                from r in project.MappedPackage
+                from r in project.MappedPackages
                 where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
                 select r).FirstOrDefault();
 
             if (mappedPackage is null)
             {
                 mappedPackage = new MappedPackage();
-                project.MappedPackage.Add(mappedPackage);
+                project.MappedPackages.Add(mappedPackage);
             }
 
             mappedPackage.PackageName = packageName;

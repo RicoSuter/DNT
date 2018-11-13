@@ -41,7 +41,8 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        public List<MappedPackage> MappedPackage { get; set; } = new List<MappedPackage>();
+        [JsonProperty("mappedPackages")]
+        public List<MappedPackage> MappedPackages { get; set; } = new List<MappedPackage>();
     }
 
     public class MappedPackage

@@ -38,13 +38,13 @@ namespace Dnt.Commands.Packages
             {
                 var projectPath = mapping.Value.ActualPath;
                 var packageName = mapping.Key;
-                var packageVersion = mapping.Value.Version;
+                var defaultPackageVersion = mapping.Value.Version;
 
-                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, packageVersion, mappedProjectFilePaths, host);
+                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, defaultPackageVersion, mappedProjectFilePaths, host);
                 foreach (var s in switchedProjects)
                 {
                     host.WriteMessage(Path.GetFileName(s) + ": \n");
-                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + " v" + packageVersion + "\n");
+                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + " v" + defaultPackageVersion + "\n");
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Dnt.Commands.Packages
 
         private static IReadOnlyList<string> SwitchToPackage(
             ReferenceSwitcherConfiguration configuration, SolutionFile solution, string projectPath,
-            string packageName, string packageVersion, List<string> mappedProjectFilePaths, IConsoleHost host)
+            string packageName, string defaultPackageVersion, List<string> mappedProjectFilePaths, IConsoleHost host)
         {
             var switchedProjects = new List<string>();
             var absoluteProjectPath = PathUtilities.ToAbsolutePath(projectPath, Directory.GetCurrentDirectory());
@@ -104,6 +104,8 @@ namespace Dnt.Commands.Packages
                                     }
                                     else
                                     {
+                                        var packageVersion = GetPackageVersion(configuration, solutionProject.AbsolutePath, packageName, defaultPackageVersion);
+
                                         AddSdkPackage(project, packageName, packageVersion);
                                     }
 
@@ -142,10 +144,7 @@ namespace Dnt.Commands.Packages
             if (legacyProject != null)
             {
                 var reference = legacyProject.GetReference(packageName);
-                project.AddItem(
-                    "Reference",
-                    reference.Include,
-                    reference.Metadata);
+                project.AddItem("Reference", reference.Include, reference.Metadata);
             }
         }
 
@@ -153,6 +152,31 @@ namespace Dnt.Commands.Packages
         {
             project.AddItem("PackageReference", packageName,
                 new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+        }
+
+        private static string GetPackageVersion(ReferenceSwitcherConfiguration configuration, string projectFullPath, string packageName, string defaultPackageVersion)
+        {
+            var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
+            string result = null;
+
+            var mappedProject = (
+                from p in configuration.SdkProjects
+                where string.Equals(p.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                select p).FirstOrDefault();
+
+            if (mappedProject != null)
+            {
+                result = (
+                    from m in mappedProject.MappedPackages
+                    where string.Equals(m.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
+                    select m.Version
+                    ).FirstOrDefault();
+            }
+
+            if (result is null)
+                result = defaultPackageVersion;
+
+            return result;
         }
 
     }
