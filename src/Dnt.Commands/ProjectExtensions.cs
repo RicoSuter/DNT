@@ -61,7 +61,7 @@ namespace Dnt.Commands
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
-            return new ProjectInformation(projectCollection) { Project = project, IsLegacyProject = false };
+            return new ProjectInformation(projectCollection, project, false);
         }
 
         private static ProjectInformation GetSdkroject(string projectPath)
@@ -80,7 +80,7 @@ namespace Dnt.Commands
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
-            return new ProjectInformation(projectCollection) { Project = project, IsLegacyProject = false };
+            return new ProjectInformation(projectCollection, project, true);
         }
 
         private static string GetToolsPath()
@@ -206,21 +206,22 @@ namespace Dnt.Commands
 
             throw new Exception("Could not locate base path in `dotnet --info` results");
         }
-
     }
 
     public class ProjectInformation : IDisposable
     {
         private readonly ProjectCollection _projectCollection;
 
-        public ProjectInformation(ProjectCollection projectCollection)
+        public ProjectInformation(ProjectCollection projectCollection, Project project, bool isLegacyProject)
         {
             _projectCollection = projectCollection;
+            Project = project;
+            IsLegacyProject = isLegacyProject;
         }
 
-        public Project Project { get; set; }
+        public Project Project { get; }
 
-        public bool IsLegacyProject { get; set; }
+        public bool IsLegacyProject { get; }
 
         public void Dispose()
         {
