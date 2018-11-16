@@ -24,6 +24,7 @@ namespace Dnt.Commands.Packages
             SwitchToPackages(host, configuration);
             await RemoveProjectsFromSolutionAsync(configuration, host);
 
+            configuration.Restore = null; // restore information no longer needed
             configuration.Save();
 
             return null;
@@ -32,11 +33,11 @@ namespace Dnt.Commands.Packages
         private static void SwitchToPackages(IConsoleHost host, ReferenceSwitcherConfiguration configuration)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
-            var mappedProjectFilePaths = configuration.Mappings.Select(m => Path.GetFileName(m.Value.ActualPath)).ToList();
+            var mappedProjectFilePaths = configuration.Mappings.Select(m => Path.GetFileName(m.Value)).ToList();
 
             foreach (var mapping in configuration.Mappings)
             {
-                var projectPath = mapping.Value.ActualPath;
+                var projectPath = configuration.GetActualPath(mapping.Value);
                 var packageName = mapping.Key;
 
                 var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, mappedProjectFilePaths, host);
@@ -57,7 +58,7 @@ namespace Dnt.Commands.Packages
                 var project = solution.ProjectsInOrder.FirstOrDefault(p => p.ProjectName == mapping.Key);
                 if (project != null)
                 {
-                    projects.Add("\"" + mapping.Value.ActualPath + "\"");
+                    projects.Add("\"" + configuration.GetActualPath(mapping.Value) + "\"");
                 }
             }
 
