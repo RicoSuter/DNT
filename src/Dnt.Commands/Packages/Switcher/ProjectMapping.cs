@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Dnt.Commands.Packages.Switcher
 {
-    public class SwitchedProject
+    public class RestoreProjectInformation
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -29,22 +29,19 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("packageName")]
         public string PackageName { get; set; }
 
-        [JsonProperty("version")]
+        [JsonProperty("version", NullValueHandling = NullValueHandling.Ignore)]
         public string PackageVersion { get; set; }
 
-        [JsonProperty("include")]
+        [JsonProperty("include", NullValueHandling = NullValueHandling.Ignore)]
         public string Include { get; set; }
 
-        [JsonProperty("metadata")]
-        public List<KeyValuePair<string, string>> Metadata { get; set; } = new List<KeyValuePair<string, string>>();
+        [JsonProperty("metadata", NullValueHandling = NullValueHandling.Ignore)]
+        public List<KeyValuePair<string, string>> Metadata { get; set; }
     }
     
     public class ProjectMapping
     {
         internal ReferenceSwitcherConfiguration Parent { get; set; }
-
-        [JsonProperty("version")]
-        public string Version { get; set; }
 
         [JsonProperty("path")]
         public string Path { get; set; }

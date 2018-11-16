@@ -38,13 +38,12 @@ namespace Dnt.Commands.Packages
             {
                 var projectPath = mapping.Value.ActualPath;
                 var packageName = mapping.Key;
-                var defaultPackageVersion = mapping.Value.Version;
 
-                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, defaultPackageVersion, mappedProjectFilePaths, host);
+                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, mappedProjectFilePaths, host);
                 foreach (var s in switchedProjects)
                 {
                     host.WriteMessage(Path.GetFileName(s) + ": \n");
-                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + " v" + defaultPackageVersion + "\n");
+                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + "\n");
                 }
             }
         }
@@ -70,7 +69,7 @@ namespace Dnt.Commands.Packages
 
         private static IReadOnlyList<string> SwitchToPackage(
             ReferenceSwitcherConfiguration configuration, SolutionFile solution, string projectPath,
-            string packageName, string defaultPackageVersion, List<string> mappedProjectFilePaths, IConsoleHost host)
+            string packageName, List<string> mappedProjectFilePaths, IConsoleHost host)
         {
             var switchedProjects = new List<string>();
             var absoluteProjectPath = PathUtilities.ToAbsolutePath(projectPath, Directory.GetCurrentDirectory());
@@ -84,31 +83,46 @@ namespace Dnt.Commands.Packages
                     {
                         var projectInformation = ProjectExtensions.GetProject(solutionProject.AbsolutePath);
                         var project = projectInformation.Project;
+                        var projectName = Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
                         var projectFileName = Path.GetFileName(solutionProject.AbsolutePath);
                         var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
 
                         if (!mappedProjectFilePaths.Contains(projectFileName)) // do not modify mapped projects
                         {
-                            var count = 0;
-                            foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
+                            var restoreProjectInformation = (
+                                from r in configuration.Restore
+                                where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                                select r).FirstOrDefault();
+
+                            if (restoreProjectInformation != null)
                             {
-                                var absoluteProjectReferencePath =
-                                    PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
-                                if (absoluteProjectReferencePath == absoluteProjectPath)
+                                var count = 0;
+                                foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
                                 {
-                                    project.RemoveItem(item);
-                                    
-                                    var packageVersion = GetPackageVersion(configuration, solutionProject.AbsolutePath, packageName, defaultPackageVersion);
-                                    AddPackage(configuration, solutionProject, project, packageName, packageVersion);
-                                    
-                                    switchedProjects.Add(solutionProject.AbsolutePath);
-                                    count++;
+                                    var absoluteProjectReferencePath =
+                                        PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
+                                    if (absoluteProjectReferencePath == absoluteProjectPath)
+                                    {
+                                        project.RemoveItem(item);
+
+                                        var packageVersion = GetPackageVersion(restoreProjectInformation, packageName);
+                                        AddPackage(configuration, solutionProject, project, packageName, packageVersion);
+
+                                        switchedProjects.Add(solutionProject.AbsolutePath);
+                                        count++;
+                                    }
+                                }
+
+                                configuration.Restore.Remove(restoreProjectInformation);
+
+                                if (count > 0)
+                                {
+                                    project.Save();
                                 }
                             }
-
-                            if (count > 0)
+                            else
                             {
-                                project.Save();
+                                host.WriteMessage($"Skipped '{projectName}': Restoration information not found.\n");
                             }
                         }
                     }
@@ -129,7 +143,7 @@ namespace Dnt.Commands.Packages
                 Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
 
             var switchedProject = (
-                from r in configuration.SwitchedProjects
+                from r in configuration.Restore
                 where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
                 select r).FirstOrDefault();
 
@@ -150,27 +164,18 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private static string GetPackageVersion(ReferenceSwitcherConfiguration configuration, string projectFullPath, string packageName, string defaultPackageVersion)
+        private static string GetPackageVersion(RestoreProjectInformation restoreProjectInformation, string packageName)
         {
-            var projectName = Path.GetFileNameWithoutExtension(projectFullPath);
             string result = null;
 
-            var switchedProject = (
-                from p in configuration.SwitchedProjects
-                where string.Equals(p.Name, projectName, StringComparison.OrdinalIgnoreCase)
-                select p).FirstOrDefault();
-
-            if (switchedProject != null)
+            if (restoreProjectInformation != null)
             {
                 result = (
-                    from m in switchedProject.Packages
-                    where string.Equals(m.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
-                    select m.PackageVersion
+                    from r in restoreProjectInformation.Packages
+                    where string.Equals(r.PackageName, packageName, StringComparison.OrdinalIgnoreCase)
+                    select r.PackageVersion
                     ).FirstOrDefault();
             }
-
-            if (result is null)
-                result = defaultPackageVersion;
 
             return result;
         }

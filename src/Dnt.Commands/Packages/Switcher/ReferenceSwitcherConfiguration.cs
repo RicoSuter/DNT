@@ -16,8 +16,8 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("mappings")]
         public Dictionary<string, ProjectMapping> Mappings { get; } = new Dictionary<string, ProjectMapping>();
 
-        [JsonProperty("projects")]
-        public List<SwitchedProject> SwitchedProjects { get; set; } = new List<SwitchedProject>();
+        [JsonProperty("restore", NullValueHandling = NullValueHandling.Ignore)]
+        public List<RestoreProjectInformation> Restore { get; set; } = new List<RestoreProjectInformation>();
 
         [JsonIgnore]
         public string ActualSolution => PathUtilities.ToAbsolutePath(Solution, System.IO.Path.GetDirectoryName(Path));
