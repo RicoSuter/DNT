@@ -51,58 +51,28 @@ namespace Dnt.Commands.Packages
         private static void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
-            foreach (var mapping in configuration.Mappings)
-            {
-                var packageName = mapping.Key;
-                var projectPath = configuration.GetActualPath(mapping.Value);
-
-                var switchedProjects = SwitchToProject(configuration, solution, packageName, projectPath, host);
-                foreach (var s in switchedProjects)
-                {
-                    host.WriteMessage(Path.GetFileName(s.Key) + ": \n");
-                    host.WriteMessage("   " + packageName + " v" + s.Value + " => " + Path.GetFileName(projectPath) +
-                                      "\n");
-                }
-            }
-        }
-
-        private static IReadOnlyDictionary<string, string> SwitchToProject(ReferenceSwitcherConfiguration configuration,
-            SolutionFile solution, string packageName, string projectPath, IConsoleHost host)
-        {
-            var switchedProjects = new Dictionary<string, string>();
             foreach (var solutionProject in solution.ProjectsInOrder)
             {
                 if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder)
                 {
                     try
                     {
-                        var projectInformation = ProjectExtensions.GetProject(solutionProject.AbsolutePath);
-                        var project = projectInformation.Project;
-                        var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
-
-                        foreach (var item in project.Items
-                            .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath))
                         {
-                            var packageReference = item.EvaluatedInclude.Split(',').First().Trim();
-
-                            if (packageReference == packageName)
+                            foreach (var mapping in configuration.Mappings)
                             {
-                                var isPackageReference = (item.ItemType == "PackageReference");
-                                var packageVersion =
-                                    item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
+                                var packageName = mapping.Key;
+                                var projectPath = configuration.GetActualPath(mapping.Value);
 
-                                project.RemoveItem(item);
-                                project.AddItem("ProjectReference",
-                                    PathUtilities.ToRelativePath(projectPath, projectDirectory));
-
-                                SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
-                                    packageName, packageVersion);
-
-                                switchedProjects[solutionProject.AbsolutePath] = packageVersion;
+                                var switchedProjects = SwitchToProject(configuration, solutionProject, projectInformation, packageName, projectPath, host);
+                                foreach (var s in switchedProjects)
+                                {
+                                    host.WriteMessage(Path.GetFileName(s.Key) + ": \n");
+                                    host.WriteMessage("   " + packageName + " v" + s.Value + " => " + Path.GetFileName(projectPath) +
+                                                      "\n");
+                                }
                             }
                         }
-
-                        project.Save();
                     }
                     catch (Exception e)
                     {
@@ -111,6 +81,38 @@ namespace Dnt.Commands.Packages
                     }
                 }
             }
+        }
+
+        private static IReadOnlyDictionary<string, string> SwitchToProject(ReferenceSwitcherConfiguration configuration,
+            ProjectInSolution solutionProject, ProjectInformation projectInformation, string packageName, string projectPath, IConsoleHost host)
+        {
+            var switchedProjects = new Dictionary<string, string>();
+            var project = projectInformation.Project;
+            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
+
+            foreach (var item in project.Items
+                .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
+            {
+                var packageReference = item.EvaluatedInclude.Split(',').First().Trim();
+
+                if (packageReference == packageName)
+                {
+                    var isPackageReference = (item.ItemType == "PackageReference");
+                    var packageVersion =
+                        item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
+
+                    project.RemoveItem(item);
+                    project.AddItem("ProjectReference",
+                        PathUtilities.ToRelativePath(projectPath, projectDirectory));
+
+                    SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
+                        packageName, packageVersion);
+
+                    switchedProjects[solutionProject.AbsolutePath] = packageVersion;
+                }
+            }
+
+            project.Save();
 
             return switchedProjects;
         }

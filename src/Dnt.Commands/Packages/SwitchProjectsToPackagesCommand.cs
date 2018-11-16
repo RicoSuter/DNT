@@ -35,16 +35,36 @@ namespace Dnt.Commands.Packages
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var mappedProjectFilePaths = configuration.Mappings.Select(m => Path.GetFileName(m.Value)).ToList();
 
-            foreach (var mapping in configuration.Mappings)
+            foreach (var solutionProject in solution.ProjectsInOrder)
             {
-                var projectPath = configuration.GetActualPath(mapping.Value);
-                var packageName = mapping.Key;
-
-                var switchedProjects = SwitchToPackage(configuration, solution, projectPath, packageName, mappedProjectFilePaths, host);
-                foreach (var s in switchedProjects)
+                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder &&
+                    ProjectExtensions.IsSupportedProject(solutionProject.AbsolutePath))
                 {
-                    host.WriteMessage(Path.GetFileName(s) + ": \n");
-                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + "\n");
+                    try
+                    {
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath))
+                        {
+                            foreach (var mapping in configuration.Mappings)
+                            {
+                                var projectPath = configuration.GetActualPath(mapping.Value);
+                                var packageName = mapping.Key;
+
+                                var switchedProjects = SwitchToPackage(
+                                    configuration, solutionProject, projectInformation, projectPath, packageName, mappedProjectFilePaths, host);
+
+                                foreach (var s in switchedProjects)
+                                {
+                                    host.WriteMessage(Path.GetFileName(s) + ": \n");
+                                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + "\n");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        host.WriteError("The project '" + solutionProject.AbsolutePath + "' could not be loaded: " +
+                                        e.Message + "\n");
+                    }
                 }
             }
         }
@@ -69,68 +89,48 @@ namespace Dnt.Commands.Packages
         }
 
         private static IReadOnlyList<string> SwitchToPackage(
-            ReferenceSwitcherConfiguration configuration, SolutionFile solution, string projectPath,
-            string packageName, List<string> mappedProjectFilePaths, IConsoleHost host)
+            ReferenceSwitcherConfiguration configuration,
+            ProjectInSolution solutionProject, ProjectInformation projectInformation,
+            string switchedProjectPath, string switchedPackageName,
+            List<string> mappedProjectFilePaths, IConsoleHost host)
         {
             var switchedProjects = new List<string>();
-            var absoluteProjectPath = PathUtilities.ToAbsolutePath(projectPath, Directory.GetCurrentDirectory());
+            var absoluteProjectPath = PathUtilities.ToAbsolutePath(switchedProjectPath, Directory.GetCurrentDirectory());
 
-            foreach (var solutionProject in solution.ProjectsInOrder)
+            var project = projectInformation.Project;
+            var projectName = Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
+            var projectFileName = Path.GetFileName(solutionProject.AbsolutePath);
+            var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
+
+            if (!mappedProjectFilePaths.Contains(projectFileName)) // do not modify mapped projects
             {
-                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder &&
-                    ProjectExtensions.IsSupportedProject(solutionProject.AbsolutePath))
+                var restoreProjectInformation = (
+                    from r in configuration.Restore
+                    where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                    select r).FirstOrDefault();
+
+                if (restoreProjectInformation != null)
                 {
-                    try
+                    var count = 0;
+                    foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
                     {
-                        var projectInformation = ProjectExtensions.GetProject(solutionProject.AbsolutePath);
-                        var project = projectInformation.Project;
-                        var projectName = Path.GetFileNameWithoutExtension(solutionProject.AbsolutePath);
-                        var projectFileName = Path.GetFileName(solutionProject.AbsolutePath);
-                        var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
-
-                        if (!mappedProjectFilePaths.Contains(projectFileName)) // do not modify mapped projects
+                        var absoluteProjectReferencePath =
+                            PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
+                        if (absoluteProjectReferencePath == absoluteProjectPath)
                         {
-                            var restoreProjectInformation = (
-                                from r in configuration.Restore
-                                where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
-                                select r).FirstOrDefault();
+                            project.RemoveItem(item);
 
-                            if (restoreProjectInformation != null)
-                            {
-                                var count = 0;
-                                foreach (var item in project.Items.Where(i => i.ItemType == "ProjectReference").ToList())
-                                {
-                                    var absoluteProjectReferencePath =
-                                        PathUtilities.ToAbsolutePath(item.EvaluatedInclude, projectDirectory);
-                                    if (absoluteProjectReferencePath == absoluteProjectPath)
-                                    {
-                                        project.RemoveItem(item);
+                            var packageVersion = GetPackageVersion(restoreProjectInformation, switchedPackageName);
+                            AddPackage(configuration, solutionProject, project, switchedPackageName, packageVersion);
 
-                                        var packageVersion = GetPackageVersion(restoreProjectInformation, packageName);
-                                        AddPackage(configuration, solutionProject, project, packageName, packageVersion);
-
-                                        switchedProjects.Add(solutionProject.AbsolutePath);
-                                        count++;
-                                    }
-                                }
-
-                                configuration.Restore.Remove(restoreProjectInformation);
-
-                                if (count > 0)
-                                {
-                                    project.Save();
-                                }
-                            }
-                            else
-                            {
-                                host.WriteMessage($"Skipped '{projectName}': Restoration information not found.\n");
-                            }
+                            switchedProjects.Add(solutionProject.AbsolutePath);
+                            count++;
                         }
                     }
-                    catch (Exception e)
+
+                    if (count > 0)
                     {
-                        host.WriteError("The project '" + solutionProject.AbsolutePath + "' could not be loaded: " +
-                                        e.Message + "\n");
+                        project.Save();
                     }
                 }
             }
@@ -180,6 +180,5 @@ namespace Dnt.Commands.Packages
 
             return result;
         }
-
     }
 }

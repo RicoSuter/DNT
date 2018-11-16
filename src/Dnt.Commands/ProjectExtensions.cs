@@ -29,46 +29,45 @@ namespace Dnt.Commands
             return (projectAbsolutePath.EndsWith(".csproj") || projectAbsolutePath.EndsWith(".vbproj"));
         }
 
-        // Based on https://daveaglick.com/posts/running-a-design-time-build-with-msbuild-apis
-        public static ProjectInformation GetProject(string projectPath)
+        public static ProjectInformation LoadProject(string projectPath)
         {
-            Project result = null;
-            bool sdkStyle = false;
+            // Based on https://daveaglick.com/posts/running-a-design-time-build-with-msbuild-apis
+
             using (XmlReader reader = XmlReader.Create(projectPath))
             {
                 if (reader.MoveToContent() == XmlNodeType.Element && reader.HasAttributes)
                 {
-                    sdkStyle = reader.MoveToAttribute("Sdk");
-                    if (sdkStyle)
+                    var isSdkStyle = reader.MoveToAttribute("Sdk");
+                    if (isSdkStyle)
                     {
-                        result = GetCoreProject(projectPath);
+                        return GetSdkroject(projectPath);
                     }
                     else
                     {
-                        result = GetLegacyProject(projectPath);
+                        return GetLegacyProject(projectPath);
                     }
                 }
             }
 
-            return new ProjectInformation() { Project = result, IsLegacyProject = !sdkStyle };
+            throw new InvalidOperationException("Not a project.");
         }
 
-        public static Project GetLegacyProject(string projectPath)
+        private static ProjectInformation GetLegacyProject(string projectPath)
         {
-            string toolsPath = GetToolsPath();
-            Dictionary<string, string> globalProperties = GetGlobalProperties(projectPath, toolsPath);
+            var toolsPath = GetToolsPath();
+            var globalProperties = GetLegacyGlobalProperties(projectPath, toolsPath);
 
-            ProjectCollection projectCollection = new ProjectCollection(globalProperties);
+            var projectCollection = new ProjectCollection(globalProperties);
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
-            Project project = projectCollection.LoadProject(projectPath);
-            return project;
+
+            var project = projectCollection.LoadProject(projectPath);
+            return new ProjectInformation(projectCollection) { Project = project, IsLegacyProject = false };
         }
 
-        public static Project GetCoreProject(string projectPath)
+        private static ProjectInformation GetSdkroject(string projectPath)
         {
-            string toolsPath = GetCoreBasePath(projectPath);
-            Dictionary<string, string> globalProperties = GetCoreGlobalProperties(projectPath, toolsPath);
-
+            var toolsPath = GetSdkBasePath(projectPath);
+            var globalProperties = GetSdkGlobalProperties(projectPath, toolsPath);
 
             Environment.SetEnvironmentVariable(
                 "MSBuildExtensionsPath",
@@ -77,14 +76,16 @@ namespace Dnt.Commands
                 "MSBuildSDKsPath",
                 globalProperties["MSBuildSDKsPath"]);
 
-            ProjectCollection projectCollection = new ProjectCollection(globalProperties);
+            var projectCollection = new ProjectCollection(globalProperties);
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
-            return projectCollection.LoadProject(projectPath);
+
+            var project = projectCollection.LoadProject(projectPath);
+            return new ProjectInformation(projectCollection) { Project = project, IsLegacyProject = false };
         }
 
-        public static string GetToolsPath()
+        private static string GetToolsPath()
         {
-            string toolsPath = ToolLocationHelper.GetPathToBuildToolsFile("msbuild.exe", ToolLocationHelper.CurrentToolsVersion);
+            var toolsPath = ToolLocationHelper.GetPathToBuildToolsFile("msbuild.exe", ToolLocationHelper.CurrentToolsVersion);
             if (string.IsNullOrEmpty(toolsPath))
             {
                 toolsPath = PollForToolsPath().FirstOrDefault();
@@ -93,10 +94,11 @@ namespace Dnt.Commands
             {
                 throw new Exception("Could not locate the tools (MSBuild) path.");
             }
+
             return Path.GetDirectoryName(toolsPath);
         }
 
-        public static string[] PollForToolsPath()
+        private static string[] PollForToolsPath()
         {
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
@@ -110,12 +112,12 @@ namespace Dnt.Commands
             }.Where(File.Exists).ToArray();
         }
 
-        public static Dictionary<string, string> GetGlobalProperties(string projectPath, string toolsPath)
+        private static Dictionary<string, string> GetLegacyGlobalProperties(string projectPath, string toolsPath)
         {
-            string solutionDir = Path.GetDirectoryName(projectPath);
-            string extensionsPath = Path.GetFullPath(Path.Combine(toolsPath, @"..\..\"));
-            string sdksPath = Path.Combine(extensionsPath, "Sdks");
-            string roslynTargetsPath = Path.Combine(toolsPath, "Roslyn");
+            var solutionDir = Path.GetDirectoryName(projectPath);
+            var extensionsPath = Path.GetFullPath(Path.Combine(toolsPath, @"..\..\"));
+            var sdksPath = Path.Combine(extensionsPath, "Sdks");
+            var roslynTargetsPath = Path.Combine(toolsPath, "Roslyn");
 
             return new Dictionary<string, string>
             {
@@ -126,12 +128,12 @@ namespace Dnt.Commands
             };
         }
 
-        public static Dictionary<string, string> GetCoreGlobalProperties(string projectPath, string toolsPath)
+        private static Dictionary<string, string> GetSdkGlobalProperties(string projectPath, string toolsPath)
         {
-            string solutionDir = Path.GetDirectoryName(projectPath);
-            string extensionsPath = toolsPath;
-            string sdksPath = Path.Combine(toolsPath, "Sdks");
-            string roslynTargetsPath = Path.Combine(toolsPath, "Roslyn");
+            var solutionDir = Path.GetDirectoryName(projectPath);
+            var extensionsPath = toolsPath;
+            var sdksPath = Path.Combine(toolsPath, "Sdks");
+            var roslynTargetsPath = Path.Combine(toolsPath, "Roslyn");
 
             return new Dictionary<string, string>
             {
@@ -142,17 +144,17 @@ namespace Dnt.Commands
             };
         }
 
-        public static string GetCoreBasePath(string projectPath)
+        private static string GetSdkBasePath(string projectPath)
         {
             // Ensure that we set the DOTNET_CLI_UI_LANGUAGE environment variable to "en-US" before
             // running 'dotnet --info'. Otherwise, we may get localized results.
-            string originalCliLanguage = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
-            Environment.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-US");
+            var originalCliLanguage = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
 
+            Environment.SetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-US");
             try
             {
                 // Create the process info
-                ProcessStartInfo startInfo = new ProcessStartInfo("dotnet", "--info")
+                var startInfo = new ProcessStartInfo("dotnet", "--info")
                 {
                     // global.json may change the version, so need to set working directory
                     WorkingDirectory = Path.GetDirectoryName(projectPath),
@@ -163,9 +165,9 @@ namespace Dnt.Commands
                 };
 
                 // Execute the process
-                using (Process process = Process.Start(startInfo))
+                using (var process = Process.Start(startInfo))
                 {
-                    List<string> lines = new List<string>();
+                    var lines = new List<string>();
                     process.OutputDataReceived += (_, e) =>
                     {
                         if (!string.IsNullOrWhiteSpace(e.Data))
@@ -173,9 +175,10 @@ namespace Dnt.Commands
                             lines.Add(e.Data);
                         }
                     };
+
                     process.BeginOutputReadLine();
                     process.WaitForExit();
-                    return ParseCoreBasePath(lines);
+                    return ParseSdkBasePath(lines);
                 }
             }
             finally
@@ -184,7 +187,7 @@ namespace Dnt.Commands
             }
         }
 
-        public static string ParseCoreBasePath(List<string> lines)
+        private static string ParseSdkBasePath(List<string> lines)
         {
             if (lines == null || lines.Count == 0)
             {
@@ -193,9 +196,9 @@ namespace Dnt.Commands
 
             foreach (string line in lines)
             {
-                int colonIndex = line.IndexOf(':');
-                if (colonIndex >= 0
-                    && line.Substring(0, colonIndex).Trim().Equals("Base Path", StringComparison.OrdinalIgnoreCase))
+                var colonIndex = line.IndexOf(':');
+                if (colonIndex >= 0 &&
+                    line.Substring(0, colonIndex).Trim().Equals("Base Path", StringComparison.OrdinalIgnoreCase))
                 {
                     return line.Substring(colonIndex + 1).Trim();
                 }
@@ -206,10 +209,22 @@ namespace Dnt.Commands
 
     }
 
-    public class ProjectInformation
+    public class ProjectInformation : IDisposable
     {
-        public Project Project { get; set; }
-        public bool IsLegacyProject { get; set; }
-    }
+        private readonly ProjectCollection _projectCollection;
 
+        public ProjectInformation(ProjectCollection projectCollection)
+        {
+            _projectCollection = projectCollection;
+        }
+
+        public Project Project { get; set; }
+
+        public bool IsLegacyProject { get; set; }
+
+        public void Dispose()
+        {
+            _projectCollection.Dispose();
+        }
+    }
 }
