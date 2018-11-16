@@ -157,8 +157,13 @@ namespace Dnt.Commands.Packages
                 }
                 else
                 {
-                    project.AddItem("PackageReference", packageName,
+                    var items = project.AddItem("PackageReference", packageName,
                         new[] { new KeyValuePair<string, string>("Version", packageVersion) });
+
+                    items.ToList().ForEach(item =>
+                    {
+                        item.Metadata?.ToList().ForEach(metadata => metadata.Xml.ExpressedAsAttribute = true);
+                    });
                 }
 
             }
