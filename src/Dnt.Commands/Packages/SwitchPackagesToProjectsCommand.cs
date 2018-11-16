@@ -35,10 +35,9 @@ namespace Dnt.Commands.Packages
             var projects = new List<string>();
             foreach (var mapping in configuration.Mappings)
             {
-                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)
-                ) // check that it's not already in the solution
+                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
                 {
-                    projects.Add("\"" + mapping.Value.ActualPath + "\"");
+                    projects.Add("\"" + configuration.GetActualPath(mapping.Value) + "\"");
                 }
             }
 
@@ -55,7 +54,7 @@ namespace Dnt.Commands.Packages
             foreach (var mapping in configuration.Mappings)
             {
                 var packageName = mapping.Key;
-                var projectPath = mapping.Value.ActualPath;
+                var projectPath = configuration.GetActualPath(mapping.Value);
 
                 var switchedProjects = SwitchToProject(configuration, solution, packageName, projectPath, host);
                 foreach (var s in switchedProjects)
@@ -123,12 +122,12 @@ namespace Dnt.Commands.Packages
 
             var restoreProjectInformation =
                 (from r in configuration.Restore
-                    where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
-                    select r).FirstOrDefault();
+                 where string.Equals(r.Name, projectName, StringComparison.OrdinalIgnoreCase)
+                 select r).FirstOrDefault();
 
             if (restoreProjectInformation is null)
             {
-                restoreProjectInformation = new RestoreProjectInformation() {Name = projectName};
+                restoreProjectInformation = new RestoreProjectInformation() { Name = projectName };
                 configuration.Restore.Add(restoreProjectInformation);
             }
 
