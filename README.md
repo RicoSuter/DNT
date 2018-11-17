@@ -140,7 +140,7 @@ This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitche
 
 #### Usage
 
-Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
+Create a `switcher.json` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
 
 **Sample:** Here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution: 
 
@@ -148,18 +148,10 @@ Create `njs-switch.dnt` file and specify the solution to look for projects, and 
 {
   "solution": "NSwag.sln",
   "mappings": {
-    "NJsonSchema": {
-      "path": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj"
-    },
-    "NJsonSchema.CodeGeneration": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj"
-    },
-    "NJsonSchema.CodeGeneration.CSharp": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj"
-    },
-    "NJsonSchema.CodeGeneration.TypeScript": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
-    }
+    "NJsonSchema": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj",
+    "NJsonSchema.CodeGeneration": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj",
+    "NJsonSchema.CodeGeneration.CSharp": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj",
+    "NJsonSchema.CodeGeneration.TypeScript": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
   }
 }
 ```
@@ -167,7 +159,7 @@ Create `njs-switch.dnt` file and specify the solution to look for projects, and 
 Then switch to projects in the solution: 
 
 ```
-dnt switch-to-projects njs-switch.dnt
+dnt switch-to-projects switcher.json
 ```
 
 Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
@@ -177,7 +169,7 @@ Now all NJsonSchema package references in the NSwag solution are replaced by loc
 After implementing and testing, switch back to NuGet references and update to the latest version: 
 
 ```
-dnt switch-to-packages njs-switch.dnt
+dnt switch-to-packages switcher.json
 dnt update-packages NJsonSchema*
 ```
 
