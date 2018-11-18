@@ -28,7 +28,7 @@ Uninstall the tool:
 dotnet tool uninstall -g dnt
 ```
 
-### NPM
+### NPM CLI package
 
 Globally install/update via NPM (.NET 4.6.2+ and .NET Core 2.1+):
 
