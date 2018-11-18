@@ -33,7 +33,7 @@ namespace Dnt.Commands
         {
             // Based on https://daveaglick.com/posts/running-a-design-time-build-with-msbuild-apis
 
-            using (XmlReader reader = XmlReader.Create(projectPath))
+            using (var reader = XmlReader.Create(projectPath))
             {
                 if (reader.MoveToContent() == XmlNodeType.Element && reader.HasAttributes)
                 {
@@ -49,7 +49,7 @@ namespace Dnt.Commands
                 }
             }
 
-            throw new InvalidOperationException("Not a project.");
+            throw new InvalidOperationException("Not a project: " + projectPath);
         }
 
         private static ProjectInformation GetLegacyProject(string projectPath)
@@ -205,27 +205,6 @@ namespace Dnt.Commands
             }
 
             throw new Exception("Could not locate base path in `dotnet --info` results");
-        }
-    }
-
-    public class ProjectInformation : IDisposable
-    {
-        private readonly ProjectCollection _projectCollection;
-
-        public ProjectInformation(ProjectCollection projectCollection, Project project, bool isLegacyProject)
-        {
-            _projectCollection = projectCollection;
-            Project = project;
-            IsLegacyProject = isLegacyProject;
-        }
-
-        public Project Project { get; }
-
-        public bool IsLegacyProject { get; }
-
-        public void Dispose()
-        {
-            _projectCollection.Dispose();
         }
     }
 }

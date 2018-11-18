@@ -54,8 +54,9 @@ namespace Dnt.Commands.Packages
 
                                 foreach (var s in switchedProjects)
                                 {
-                                    host.WriteMessage(Path.GetFileName(s) + ": \n");
-                                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => " + packageName + "\n");
+                                    host.WriteMessage(Path.GetFileName(s.ProjectPath) + ": \n");
+                                    host.WriteMessage("   " + Path.GetFileName(projectPath) + " => "
+                                        + packageName + " v" + s.PackageVersion + "\n");
                                 }
                             }
                         }
@@ -88,13 +89,13 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private static IReadOnlyList<string> SwitchToPackage(
+        private static IReadOnlyList<(string ProjectPath, string PackageVersion)> SwitchToPackage(
             ReferenceSwitcherConfiguration configuration,
             ProjectInSolution solutionProject, ProjectInformation projectInformation,
             string switchedProjectPath, string switchedPackageName,
             List<string> mappedProjectFilePaths, IConsoleHost host)
         {
-            var switchedProjects = new List<string>();
+            var switchedProjects = new List<(string ProjectPath, string PackageVersion)>();
             var absoluteProjectPath = PathUtilities.ToAbsolutePath(switchedProjectPath, Directory.GetCurrentDirectory());
 
             var project = projectInformation.Project;
@@ -123,7 +124,7 @@ namespace Dnt.Commands.Packages
                             var packageVersion = GetPackageVersion(restoreProjectInformation, switchedPackageName);
                             AddPackage(configuration, solutionProject, project, switchedPackageName, packageVersion);
 
-                            switchedProjects.Add(solutionProject.AbsolutePath);
+                            switchedProjects.Add((solutionProject.AbsolutePath, packageVersion));
                             count++;
                         }
                     }
@@ -163,7 +164,8 @@ namespace Dnt.Commands.Packages
 
                     items.ToList().ForEach(item =>
                     {
-                        item.Metadata?.ToList().ForEach(metadata => metadata.Xml.ExpressedAsAttribute = true);
+                        item.Metadata?.ToList().ForEach(metadata =>
+                            metadata.Xml.ExpressedAsAttribute = true);
                     });
                 }
 
