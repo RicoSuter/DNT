@@ -147,7 +147,7 @@ dnt bump-versions patch 18
 
 This command switches NuGet assembly references to project references and vice-versa. This is useful when developing applications/libraries which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+This command supports .csproj, .vbproj, legacy and SDK-style projects (.NET Core/Standard). Previously it was implemented as a Visual Studio extension: [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher).
 
 #### Usage
 
