@@ -140,7 +140,7 @@ This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitche
 
 #### Usage
 
-Create `njs-switch.dnt` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
+Create a `switcher.json` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
 
 **Sample:** Here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution: 
 
@@ -148,18 +148,10 @@ Create `njs-switch.dnt` file and specify the solution to look for projects, and 
 {
   "solution": "NSwag.sln",
   "mappings": {
-    "NJsonSchema": {
-      "path": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj"
-    },
-    "NJsonSchema.CodeGeneration": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj"
-    },
-    "NJsonSchema.CodeGeneration.CSharp": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj"
-    },
-    "NJsonSchema.CodeGeneration.TypeScript": {
-      "path": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
-    }
+    "NJsonSchema": "../../NJsonSchema/src/NJsonSchema/NJsonSchema.csproj",
+    "NJsonSchema.CodeGeneration": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj",
+    "NJsonSchema.CodeGeneration.CSharp": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj",
+    "NJsonSchema.CodeGeneration.TypeScript": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
   }
 }
 ```
@@ -167,7 +159,7 @@ Create `njs-switch.dnt` file and specify the solution to look for projects, and 
 Then switch to projects in the solution: 
 
 ```
-dnt switch-to-projects njs-switch.dnt
+dnt switch-to-projects switcher.json
 ```
 
 Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
@@ -177,8 +169,41 @@ Now all NJsonSchema package references in the NSwag solution are replaced by loc
 After implementing and testing, switch back to NuGet references and update to the latest version: 
 
 ```
-dnt switch-to-packages njs-switch.dnt
+dnt switch-to-packages switcher.json
 dnt update-packages NJsonSchema*
+```
+
+### used-packages
+
+Lists all used packages, transitive packages in the projects and their licenses.
+
+**Parameters:**
+
+- ExcludeMicrosoft (default: true): Exclude packages which start with Microsoft.*
+- ExcludeSystem (default: true): Exclude packages which start with System.*
+- IncludeTransitiveDependencies (default: true): Also analyze transitive dependencies (i.e. indirectly referenced packages)
+
+Sample output for [NJsonSchema](http://njsonschema.org):
+
+```
+Package                              Version   #   License   License URL
+BenchmarkDotNet                      0.10.14   1   MIT       https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md
+BenchmarkDotNet.Core                 0.10.14   4   MIT       https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md
+BenchmarkDotNet.Toolchains.Roslyn    0.10.14   1   MIT       https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md
+DotLiquid                            2.0.254   1   Apache    http://www.apache.org/licenses/LICENSE-2.0
+NBench                               1.0.4     2   Apache    https://github.com/petabridge/NBench/blob/master/LICENSE
+Newtonsoft.Json                      9.0.1     4   MIT       https://raw.github.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
+NodaTime                             2.2.0     2   Apache    http://www.apache.org/licenses/LICENSE-2.0
+Pro.NBench.xUnit                     1.0.4     1   MIT       https://raw.githubusercontent.com/Pro-Coded/Pro.NBench.xUnit/master/LICENSE
+xunit                                2.3.1     7   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.abstractions                   2.0.1     2   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.analyzers                      0.7.0     1   Apache    https://raw.githubusercontent.com/xunit/xunit.analyzers/master/LICENSE
+xunit.assert                         2.3.1     1   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.core                           2.3.1     1   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.extensibility.core             2.3.1     3   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.extensibility.execution        2.3.1     1   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+xunit.runner.visualstudio            2.3.1     6   Apache    https://raw.githubusercontent.com/xunit/xunit/master/license.txt
+YamlDotNet.Signed                    5.0.1     1   MIT       https://github.com/aaubry/YamlDotNet/blob/master/LICENSE
 ```
 
 ## Project Commands
