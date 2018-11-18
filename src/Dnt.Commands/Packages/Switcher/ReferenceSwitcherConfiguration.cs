@@ -14,21 +14,23 @@ namespace Dnt.Commands.Packages.Switcher
         public string Solution { get; set; }
 
         [JsonProperty("mappings")]
-        public Dictionary<string, ProjectMapping> Mappings { get; } = new Dictionary<string, ProjectMapping>();
+        public Dictionary<string, string> Mappings { get; } = new Dictionary<string, string>();
+
+        [JsonProperty("restore", NullValueHandling = NullValueHandling.Ignore)]
+        public List<RestoreProjectInformation> Restore { get; set; } = new List<RestoreProjectInformation>();
 
         [JsonIgnore]
         public string ActualSolution => PathUtilities.ToAbsolutePath(Solution, System.IO.Path.GetDirectoryName(Path));
+
+        public string GetActualPath(string path)
+        {
+            return PathUtilities.ToAbsolutePath(path, System.IO.Path.GetDirectoryName(Path));
+        }
 
         public static ReferenceSwitcherConfiguration Load(string filePath)
         {
             var c = JsonConvert.DeserializeObject<ReferenceSwitcherConfiguration>(File.ReadAllText(filePath));
             c.Path = PathUtilities.ToAbsolutePath(filePath, Directory.GetCurrentDirectory()); ; ;
-
-            foreach (var p in c.Mappings)
-            {
-                p.Value.Parent = c;
-            }
-
             return c;
         }
 
