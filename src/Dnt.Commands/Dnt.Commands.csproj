@@ -8,6 +8,9 @@
     <Company>Rico Suter</Company>
     <PackageId>DNT.Commands</PackageId>
     <Version>1.1.0</Version>
+    <Description>Command line tools to manage .NET Core and Standard projects and solutions.</Description>
+    <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="15.8.166" />

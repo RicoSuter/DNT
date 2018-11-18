@@ -15,6 +15,9 @@
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <PackAsTool>true</PackAsTool>
+    <Description>Command line tools to manage .NET Core and Standard projects and solutions.</Description>
+    <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <OutputPath>..\Dnt.Npm\bin\binaries\NetCore21</OutputPath>
