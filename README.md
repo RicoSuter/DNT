@@ -4,9 +4,13 @@
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
-**Experimental: Command and parameter names may change. Please create issues or PRs if you'd like to fix or change something.**
+**Command and parameter names may improve or change over time. Please create issues or PRs if you'd like to fix or change something.**
 
-Install .NET Core global tool (.NET Core 2.1+ only): 
+## Installation
+
+### .NET Core global tool
+
+Install .NET Core global tool (.NET Core 2.1+ only):
 
 ```
 dotnet tool install -g dnt
@@ -18,16 +22,23 @@ Update the global tool:
 dotnet tool update -g dnt
 ```
 
-Globally install via NPM (.NET 4.6.2+ and .NET Core 2.1+)
+Uninstall the tool:
+
+```
+dotnet tool uninstall -g dnt
+```
+
+### NPM
+
+Globally install/update via NPM (.NET 4.6.2+ and .NET Core 2.1+):
 
 ```
 npm i -g dotnettools
 ```
 
-Uninstall 
+Uninstall global package:
 
 ```
-dotnet tool uninstall -g dnt
 npm uninstall -g dotnettools
 ```
 
