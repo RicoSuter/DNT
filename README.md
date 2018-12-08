@@ -4,7 +4,7 @@
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
-**Command and parameter names may improve or change over time. Please create issues or PRs if you'd like to fix or change something.**
+**Command and parameter names may improve or change over time. Please create issues or PRs if you'd like to fix, change or add a command.**
 
 ## Installation
 
