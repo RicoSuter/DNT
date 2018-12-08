@@ -1,5 +1,5 @@
 # DNT (DotNetTools)
-## Command line tools to manage .NET Core and Standard projects and solutions
+## Command line tools to manage .NET Core, Standard and SDK-style projects and solutions
 
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
@@ -239,6 +239,28 @@ Handle all warnings as errors in all selected projects:
 
 ```
 dnt enable warnaserror
+```
+
+### add-target-framework
+
+Add another target framework to the selectd projects.
+
+**Command:**
+
+```
+dnt add-target-framework TargetFramework
+```
+
+**Parameters:**
+
+- TargetFramework: Specifies the target framework to add
+
+**Samples:**
+
+Add .NET Standard 2.0 target framework to all projects:
+
+```
+dnt add-target-framework netstandard2.0
 ```
 
 ## Solution Commands
