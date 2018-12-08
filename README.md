@@ -1,12 +1,16 @@
 # DNT (DotNetTools)
-## Command line tools to manage .NET Core and Standard projects and solutions
+## Command line tools to manage .NET Core, Standard and SDK-style projects and solutions
 
 [![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
-**Experimental: Command and parameter names may change. Please create issues or PRs if you'd like to fix or change something.**
+**Command and parameter names may improve or change over time. Please create issues or PRs if you'd like to fix or change something.**
 
-Install .NET Core global tool (.NET Core 2.1+ only): 
+## Installation
+
+### .NET Core global tool
+
+Install .NET Core global tool (.NET Core 2.1+ only):
 
 ```
 dotnet tool install -g dnt
@@ -18,16 +22,23 @@ Update the global tool:
 dotnet tool update -g dnt
 ```
 
-Globally install via NPM (.NET 4.6.2+ and .NET Core 2.1+)
+Uninstall the tool:
+
+```
+dotnet tool uninstall -g dnt
+```
+
+### NPM CLI package
+
+Globally install/update via NPM (.NET 4.6.2+ and .NET Core 2.1+):
 
 ```
 npm i -g dotnettools
 ```
 
-Uninstall 
+Uninstall global package:
 
 ```
-dotnet tool uninstall -g dnt
 npm uninstall -g dotnettools
 ```
 
@@ -134,9 +145,9 @@ dnt bump-versions patch 18
 
 ### switch-to-projects
 
-This command switches NuGet assembly references to project references and vice-versa. This is useful when developing applications which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
+This command switches NuGet assembly references to project references and vice-versa. This is useful when developing applications/libraries which reference own NuGet packages: When developing an application, switch to project references so that all code is editable and debuggable. After finishing the development, create new NuGet package versions, switch back to NuGet references and upgrade to the new NuGet versions.
 
-This is [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher) for .NET Core/Standard.
+This command supports .csproj, .vbproj, legacy and SDK-style projects (.NET Core/Standard). Previously it was implemented as a Visual Studio extension: [NuGetReferenceSwitcher](https://github.com/RSuter/NuGetReferenceSwitcher).
 
 #### Usage
 
@@ -228,6 +239,28 @@ Handle all warnings as errors in all selected projects:
 
 ```
 dnt enable warnaserror
+```
+
+### add-target-framework
+
+Add another target framework to the selectd projects.
+
+**Command:**
+
+```
+dnt add-target-framework TargetFramework
+```
+
+**Parameters:**
+
+- TargetFramework: Specifies the target framework to add
+
+**Samples:**
+
+Add .NET Standard 2.0 target framework to all projects:
+
+```
+dnt add-target-framework netstandard2.0
 ```
 
 ## Solution Commands
