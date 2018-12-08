@@ -243,7 +243,7 @@ dnt enable warnaserror
 
 ### add-target-framework
 
-Add another target framework to the selectd projects.
+Add another target framework to the selected projects.
 
 **Command:**
 
