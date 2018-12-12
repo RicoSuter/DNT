@@ -123,6 +123,7 @@ namespace Dnt.Commands
             {
                 { "SolutionDir", solutionDir },
                 { "MSBuildExtensionsPath", extensionsPath },
+                { "MSBuildExtensionsPath32", extensionsPath },
                 { "MSBuildSDKsPath", sdksPath },
                 { "RoslynTargetsPath", roslynTargetsPath }
             };
