@@ -15,7 +15,7 @@ namespace Dnt
         static void Main(string[] args)
         {
             if (Debugger.IsAttached)
-                Directory.SetCurrentDirectory("..\\..\\..\\..\\test\\WebApplication461\\");
+                Directory.SetCurrentDirectory("C:\\Data\\Projects\\Playground");
 
             var stopwatch = Stopwatch.StartNew();
 

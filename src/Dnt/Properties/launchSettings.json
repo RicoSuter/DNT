@@ -2,7 +2,7 @@
   "profiles": {
     "Dnt": {
       "commandName": "Project",
-      "commandLineArgs": "switch-to-projects .\\switch.dnt"
+      "commandLineArgs": "bump-version patch /path:C:\\Data\\Projects\\NSwag\\src"
     }
   }
 }
