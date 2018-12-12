@@ -1,0 +1,6 @@
+{
+  "solution": "WebApplication461.sln",
+  "mappings": {
+    "TinyPNG": "../TinyPNG-master/TinyPNG-master/src/TinyPNG/TinyPNG.csproj"
+  }
+}
