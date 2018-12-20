@@ -263,12 +263,6 @@ Add .NET Standard 2.0 target framework to all projects:
 dnt add-target-framework netstandard2.0
 ```
 
-## Solution Commands
-
-### create-solution
-
-TBD
-
 # DNT developement and testing
 
 It is recommended to add the debug output path "DNT/src/Dnt.NetFx/bin/Debug" to the Path environment variable, or directly start the app with a command.
