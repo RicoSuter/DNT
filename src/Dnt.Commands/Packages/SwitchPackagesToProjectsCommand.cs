@@ -35,9 +35,12 @@ namespace Dnt.Commands.Packages
             var projects = new List<string>();
             foreach (var mapping in configuration.Mappings)
             {
-                if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
+                foreach (var path in mapping.Value)
                 {
-                    projects.Add("\"" + configuration.GetActualPath(mapping.Value) + "\"");
+                    if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
+                    {
+                        projects.Add("\"" + configuration.GetActualPath(path) + "\"");
+                    }
                 }
             }
 
@@ -62,14 +65,14 @@ namespace Dnt.Commands.Packages
                             foreach (var mapping in configuration.Mappings)
                             {
                                 var packageName = mapping.Key;
-                                var projectPath = configuration.GetActualPath(mapping.Value);
+                                var projectPaths = mapping.Value.Select(p => configuration.GetActualPath(p)).ToList();
 
-                                var switchedProjects = SwitchToProject(configuration, solutionProject, projectInformation, packageName, projectPath, host);
+                                var switchedProjects = SwitchToProject(configuration, solutionProject, projectInformation, packageName, projectPaths, host);
                                 foreach (var s in switchedProjects)
                                 {
-                                    host.WriteMessage(Path.GetFileName(s.Key) + ": \n");
-                                    host.WriteMessage("   " + packageName + " v" + s.Value + " => " + Path.GetFileName(projectPath) +
-                                                      "\n");
+                                    host.WriteMessage("Project " + Path.GetFileName(s.Key) + " packages:\n");
+                                    host.WriteMessage("    " + packageName + " v" + s.Value + "\n    replaced by:\n");
+                                    projectPaths.ForEach(p => host.WriteMessage("    " + Path.GetFileName(p) + "\n"));
                                 }
                             }
                         }
@@ -84,7 +87,7 @@ namespace Dnt.Commands.Packages
         }
 
         private static IReadOnlyDictionary<string, string> SwitchToProject(ReferenceSwitcherConfiguration configuration,
-            ProjectInSolution solutionProject, ProjectInformation projectInformation, string packageName, string projectPath, IConsoleHost host)
+            ProjectInSolution solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, IConsoleHost host)
         {
             var switchedProjects = new Dictionary<string, string>();
             var project = projectInformation.Project;
@@ -102,11 +105,14 @@ namespace Dnt.Commands.Packages
                         item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
 
                     project.RemoveItem(item);
-                    project.AddItem("ProjectReference",
+                    foreach (var projectPath in projectPaths)
+                    {
+                        project.AddItem("ProjectReference",
                         PathUtilities.ToRelativePath(projectPath, projectDirectory));
 
-                    SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
-                        packageName, packageVersion);
+                        SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
+                            packageName, packageVersion);
+                    }
 
                     switchedProjects[solutionProject.AbsolutePath] = packageVersion;
                 }
