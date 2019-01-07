@@ -14,7 +14,8 @@ namespace Dnt.Commands.Packages.Switcher
         public string Solution { get; set; }
 
         [JsonProperty("mappings")]
-        public Dictionary<string, string> Mappings { get; } = new Dictionary<string, string>();
+        [JsonConverter(typeof(SingleOrArrayConverter))]
+        public Dictionary<string, List<string>> Mappings { get; set; }
 
         [JsonProperty("restore", NullValueHandling = NullValueHandling.Ignore)]
         public List<RestoreProjectInformation> Restore { get; set; } = new List<RestoreProjectInformation>();
@@ -30,7 +31,7 @@ namespace Dnt.Commands.Packages.Switcher
         public static ReferenceSwitcherConfiguration Load(string filePath)
         {
             var c = JsonConvert.DeserializeObject<ReferenceSwitcherConfiguration>(File.ReadAllText(filePath));
-            c.Path = PathUtilities.ToAbsolutePath(filePath, Directory.GetCurrentDirectory()); ; ;
+            c.Path = PathUtilities.ToAbsolutePath(filePath, Directory.GetCurrentDirectory());
             return c;
         }
 

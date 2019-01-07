@@ -18,7 +18,7 @@ namespace Dnt.Commands
                 if (Path.EndsWith(".sln"))
                 {
                     var solution = SolutionFile.Parse(System.IO.Path.GetFullPath(Path));
-                    return solution.ProjectsInOrder.Select(p => p.AbsolutePath).ToArray();
+                    return solution.ProjectsInOrder.Where(p => p.ProjectType != SolutionProjectType.SolutionFolder).Select(p => p.AbsolutePath).ToArray();
                 }
 
                 return new[] { Path };
