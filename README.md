@@ -217,19 +217,19 @@ xunit.runner.visualstudio            2.3.1     6   Apache    https://raw.githubu
 YamlDotNet.Signed                    5.0.1     1   MIT       https://github.com/aaubry/YamlDotNet/blob/master/LICENSE
 ```
 
-### switch-dll-references-to-projects
+### switch-assemblies-to-projects
 
 Takes a solution file and looks through all the projects for DLL references that could instead be project references in the same solution.
 
 This does make the assumption that the assembly output of a project has the same name as the project.
 
 ```
-dnt switch-dll-references-to-projects path\to\sln
+dnt switch-assemblies-to-projects path\to\sln
 ```
 Looks for references like
 ```
     <Reference Include="PROJECTA">
-      <HintPath>..\PROJECTA\PROJECTA.dll</HintPath>
+      <HintPath>..\PROJECTA\bin\PROJECTA.dll</HintPath>
     </Reference>
 ```
  And replaces with

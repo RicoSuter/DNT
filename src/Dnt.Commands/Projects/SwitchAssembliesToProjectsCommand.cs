@@ -8,13 +8,13 @@ using NConsole;
 
 namespace Dnt.Commands.Projects
 {
-    [Command(Name = "switch-dll-references-to-projects", Description = "Updates DLL references to project references in the given projects.")]
-    public class SwitchDllReferencesToProjectsCommand : ProjectCommandBase
+    [Command(Name = "switch-assemblies-to-projects", Description = "Updates assembly references to project references in the given projects.")]
+    public class SwitchAssembliesToProjectsCommand : ProjectCommandBase
     {
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var projects = GetProjects(host);
-            ReplaceDllReferencesWithProjects(projects, host);
+            ReplaceAssemblyReferencesWithProjects(projects, host);
 
             return null;
         }
@@ -31,7 +31,7 @@ namespace Dnt.Commands.Projects
             return collection;
         }
 
-        private static void ReplaceDllReferencesWithProjects(ProjectCollection projects, IConsoleHost host)
+        private static void ReplaceAssemblyReferencesWithProjects(ProjectCollection projects, IConsoleHost host)
         {
             var projectNames = projects.LoadedProjects.Select(lp => System.IO.Path.GetFileNameWithoutExtension(lp.FullPath));
 
