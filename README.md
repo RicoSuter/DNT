@@ -219,26 +219,29 @@ YamlDotNet.Signed                    5.0.1     1   MIT       https://github.com/
 
 ### switch-assemblies-to-projects
 
-Takes a solution file and looks through all the projects for DLL references that could instead be project references in the same solution.
+Looks through all the projects for assembly/DLL references that could instead be project references in the same solution. 
 
-This does make the assumption that the assembly output of a project has the same name as the project.
+The command does make the assumption that the assembly output of a project has the same name as the project.
 
 ```
-dnt switch-assemblies-to-projects path\to\sln
+dnt switch-assemblies-to-projects
 ```
+
 Looks for references like
-```
-    <Reference Include="PROJECTA">
-      <HintPath>..\PROJECTA\bin\PROJECTA.dll</HintPath>
-    </Reference>
-```
- And replaces with
 
 ```
-    <ProjectReference Include="..\PROJECTA\PROJECTA.csproj">
-      <Project>{B12406B0-0468-4809-91E3-7991800E3ECD}</Project>
-      <Name>PROJECTA</Name>
-    </ProjectReference>
+<Reference Include="ProjectA">
+  <HintPath>..\ProjectA\bin\ProjectA.dll</HintPath>
+</Reference>
+```
+
+And replaces with
+
+```
+<ProjectReference Include="..\ProjectA\ProjectA.csproj">
+  <Project>{B12406B0-0468-4809-91E3-7991800E3ECD}</Project>
+  <Name>ProjectA</Name>
+</ProjectReference>
 ```
 
 ## Project Commands
@@ -286,6 +289,10 @@ Add .NET Standard 2.0 target framework to all projects:
 ```
 dnt add-target-framework netstandard2.0
 ```
+
+### clean
+
+Deletes all /bin and /obj directories of the selected projects.
 
 # DNT developement and testing
 
