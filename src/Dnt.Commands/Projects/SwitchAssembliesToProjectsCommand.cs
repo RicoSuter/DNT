@@ -11,21 +11,22 @@ namespace Dnt.Commands.Projects
     [Command(Name = "switch-assemblies-to-projects", Description = "Updates assembly references to project references in the given projects.")]
     public class SwitchAssembliesToProjectsCommand : ProjectCommandBase
     {
-        public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var projects = GetProjects(host);
-            ReplaceAssemblyReferencesWithProjects(projects, host);
+            using (var projects = LoadProjects())
+            {
+                ReplaceAssemblyReferencesWithProjects(projects, host);
+            }
 
-            return null;
+            return Task.FromResult<object>(null);
         }
 
-        private ProjectCollection GetProjects(IConsoleHost host)
+        private ProjectCollection LoadProjects()
         {
-            var paths = GetProjectPaths();
             var collection = new ProjectCollection();
-            foreach (var path in paths)
+            foreach (var projectPath in GetProjectPaths())
             {
-                collection.LoadProject(path);
+                collection.LoadProject(projectPath);
             }
 
             return collection;
@@ -33,25 +34,26 @@ namespace Dnt.Commands.Projects
 
         private static void ReplaceAssemblyReferencesWithProjects(ProjectCollection projects, IConsoleHost host)
         {
-            var projectNames = projects.LoadedProjects.Select(lp => System.IO.Path.GetFileNameWithoutExtension(lp.FullPath));
-
-            foreach (var proj in projects.LoadedProjects)
+            var projectNames = projects.LoadedProjects.Select(p => System.IO.Path.GetFileNameWithoutExtension(p.FullPath));
+            foreach (var project in projects.LoadedProjects)
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(proj.FullPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(project.FullPath))
                     {
                         var newProjectsToReference = new List<Project>();
-                        var dllReferencesToRemove = new List<ProjectItem>();
-                        foreach (var reference in projectInformation.Project.Items.Where(r => r.ItemType == "Reference"
-                                    && projectNames.Contains(r.UnevaluatedInclude.Split(',').First())))
+                        var assemblyReferencesToRemove = new List<ProjectItem>();
+
+                        foreach (var reference in projectInformation.Project.Items
+                            .Where(r => r.ItemType == "Reference" && projectNames.Contains(r.UnevaluatedInclude.Split(',').First())))
                         {
-                            dllReferencesToRemove.Add(reference);
+                            assemblyReferencesToRemove.Add(reference);
+
                             var projectToReference = projects.LoadedProjects.First(p => System.IO.Path.GetFileNameWithoutExtension(p.FullPath) == reference.EvaluatedInclude.Split(',').First());
                             newProjectsToReference.Add(projectToReference);
                         }
 
-                        foreach (var item in dllReferencesToRemove)
+                        foreach (var item in assemblyReferencesToRemove)
                         {
                             projectInformation.Project.RemoveItem(item);
                         }
@@ -59,22 +61,23 @@ namespace Dnt.Commands.Projects
                         foreach (var projectToReference in newProjectsToReference)
                         {
                             var refProjectDirectory = System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(projectToReference.FullPath));
-                            var relativePath = PathUtilities.ToRelativePath(refProjectDirectory, System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(proj.FullPath)));
+                            var relativePath = PathUtilities.ToRelativePath(refProjectDirectory, System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(project.FullPath)));
 
                             var path = System.IO.Path.Combine(relativePath, System.IO.Path.GetFileName(projectToReference.FullPath));
                             var metaData = new List<KeyValuePair<string, string>>
-                                {
-                                    new KeyValuePair<string, string>("Name", System.IO.Path.GetFileNameWithoutExtension(projectToReference.FullPath))
-                                };
+                            {
+                                new KeyValuePair<string, string>("Name", System.IO.Path.GetFileNameWithoutExtension(projectToReference.FullPath))
+                            };
+
                             projectInformation.Project.AddItem("ProjectReference", path, metaData);
                         }
+
                         projectInformation.Project.Save();
                     }
                 }
                 catch (Exception e)
                 {
-                    host.WriteError("The project '" + proj.FullPath + "' could not be loaded: " +
-                                    e.Message + "\n");
+                    host.WriteError("The project '" + project.FullPath + "' could not be loaded: " + e.Message + "\n");
                 }
             }
         }
