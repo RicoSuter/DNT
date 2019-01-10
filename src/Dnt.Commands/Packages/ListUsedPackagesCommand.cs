@@ -64,41 +64,43 @@ namespace Dnt.Commands.Packages
         {
             host.WriteMessage($"Loading projects ");
 
-            var collection = new ProjectCollection();
-            foreach (var projectPath in GetProjectPaths())
+            using (var collection = new ProjectCollection())
             {
-                try
+                foreach (var projectPath in GetProjectPaths())
                 {
-                    var project = collection.LoadProject(projectPath);
-                    foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference").ToList())
+                    try
                     {
-                        var packageName = item.EvaluatedInclude;
-                        var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Latest";
-
-                        if (packageName != "NETStandard.Library" &&
-                            (!ExcludeSystem || !packageName.StartsWith("System.")) &&
-                            (!ExcludeMicrosoft || !packageName.StartsWith("Microsoft.")))
+                        var project = collection.LoadProject(projectPath);
+                        foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference").ToList())
                         {
-                            var entry = packages.SingleOrDefault(p => p.Name == packageName &&
-                                                                      p.Version == packageVersion);
+                            var packageName = item.EvaluatedInclude;
+                            var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Latest";
 
-                            if (entry == null)
+                            if (packageName != "NETStandard.Library" &&
+                                (!ExcludeSystem || !packageName.StartsWith("System.")) &&
+                                (!ExcludeMicrosoft || !packageName.StartsWith("Microsoft.")))
                             {
-                                entry = new PackageReferenceInfo { Name = packageName, Version = packageVersion, Type = "t" };
-                                packages.Add(entry);
-                            }
-                            else
-                            {
-                                entry.Count++;
-                            }
+                                var entry = packages.SingleOrDefault(p => p.Name == packageName &&
+                                                                          p.Version == packageVersion);
 
-                            host.WriteMessage(".");
+                                if (entry == null)
+                                {
+                                    entry = new PackageReferenceInfo { Name = packageName, Version = packageVersion, Type = "t" };
+                                    packages.Add(entry);
+                                }
+                                else
+                                {
+                                    entry.Count++;
+                                }
+
+                                host.WriteMessage(".");
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    host.WriteError(e + "\n");
+                    catch (Exception e)
+                    {
+                        host.WriteError(e + "\n");
+                    }
                 }
             }
 
