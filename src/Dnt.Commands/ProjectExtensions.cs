@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Dnt.Commands.Infrastructure;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Utilities;
 
@@ -40,7 +41,7 @@ namespace Dnt.Commands
                     var isSdkStyle = reader.MoveToAttribute("Sdk");
                     if (isSdkStyle)
                     {
-                        return GetSdkroject(projectPath);
+                        return GetSdkProject(projectPath);
                     }
                     else
                     {
@@ -61,10 +62,10 @@ namespace Dnt.Commands
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
-            return new ProjectInformation(projectCollection, project, false);
+            return new ProjectInformation(projectCollection, project, true);
         }
 
-        private static ProjectInformation GetSdkroject(string projectPath)
+        private static ProjectInformation GetSdkProject(string projectPath)
         {
             var toolsPath = GetSdkBasePath(projectPath);
             var globalProperties = GetSdkGlobalProperties(projectPath, toolsPath);
@@ -77,10 +78,11 @@ namespace Dnt.Commands
                 globalProperties["MSBuildSDKsPath"]);
 
             var projectCollection = new ProjectCollection(globalProperties);
+
             projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
-            return new ProjectInformation(projectCollection, project, true);
+            return new ProjectInformation(projectCollection, project, false);
         }
 
         private static string GetToolsPath()
@@ -104,6 +106,7 @@ namespace Dnt.Commands
 
             return new[]
             {
+                Path.Combine(programFilesX86, @"Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"),

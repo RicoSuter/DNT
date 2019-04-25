@@ -10,7 +10,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <PackageId>DNT</PackageId>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -26,9 +26,9 @@
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build" Version="15.8.166" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" />
-    <PackageReference Include="NConsole" Version="3.12.6605.26941" />
+    <PackageReference Include="NConsole" Version="3.12.6605.26941">
+      <ExcludeAssets></ExcludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
