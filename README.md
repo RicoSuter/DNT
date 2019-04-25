@@ -217,6 +217,33 @@ xunit.runner.visualstudio            2.3.1     6   Apache    https://raw.githubu
 YamlDotNet.Signed                    5.0.1     1   MIT       https://github.com/aaubry/YamlDotNet/blob/master/LICENSE
 ```
 
+### switch-assemblies-to-projects
+
+Looks through all the projects for assembly/DLL references that could instead be project references in the same solution. 
+
+The command does make the assumption that the assembly output of a project has the same name as the project.
+
+```
+dnt switch-assemblies-to-projects
+```
+
+Looks for references like
+
+```
+<Reference Include="ProjectA">
+  <HintPath>..\ProjectA\bin\ProjectA.dll</HintPath>
+</Reference>
+```
+
+And replaces with
+
+```
+<ProjectReference Include="..\ProjectA\ProjectA.csproj">
+  <Project>{B12406B0-0468-4809-91E3-7991800E3ECD}</Project>
+  <Name>ProjectA</Name>
+</ProjectReference>
+```
+
 ## Project Commands
 
 ### enable
@@ -263,12 +290,10 @@ Add .NET Standard 2.0 target framework to all projects:
 dnt add-target-framework netstandard2.0
 ```
 
-## Solution Commands
+### clean
 
-### create-solution
+Deletes all /bin and /obj directories of the selected projects.
 
-TBD
-
-# DNT developement and testing
+# DNT development and testing
 
 It is recommended to add the debug output path "DNT/src/Dnt.NetFx/bin/Debug" to the Path environment variable, or directly start the app with a command.

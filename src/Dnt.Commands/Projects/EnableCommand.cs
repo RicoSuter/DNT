@@ -14,45 +14,47 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var collection = new ProjectCollection();
-            foreach (var projectPath in GetProjectPaths())
+            using (var collection = new ProjectCollection())
             {
-                try
+                foreach (var projectPath in GetProjectPaths())
                 {
-                    var project = collection.LoadProject(projectPath);
-
-                    var result = false;
-                    switch (Action)
+                    try
                     {
-                        case "warnaserror":
-                            result = EnableBooleanProperty(project, "WarningsAsErrors");
-                            break;
-                        case "xmldocs":
-                            result = EnableXmlDocs(project);
-                            break;
-                        default:
-                            throw new ArgumentException("The feature " + Action + " is not available.");
-                    }
+                        var project = collection.LoadProject(projectPath);
 
-                    if (result)
-                    {
-                        host.WriteMessage("[x] Enabled feature " + Action + " in project " + System.IO.Path.GetFileName(projectPath) + "\n");
-
-                        if (!Simulate)
+                        var result = false;
+                        switch (Action)
                         {
-                            project.Save();
+                            case "warnaserror":
+                                result = EnableBooleanProperty(project, "WarningsAsErrors");
+                                break;
+                            case "xmldocs":
+                                result = EnableXmlDocs(project);
+                                break;
+                            default:
+                                throw new ArgumentException("The feature " + Action + " is not available.");
                         }
-                    }
-                    else
-                    {
-                        host.WriteMessage("[ ] Feature " + Action + " already enabled in project " + System.IO.Path.GetFileName(projectPath) + "\n");
-                    }
 
-                    collection.UnloadProject(project);
-                }
-                catch (Exception e)
-                {
-                    host.WriteError(e + "\n");
+                        if (result)
+                        {
+                            host.WriteMessage("[x] Enabled feature " + Action + " in project " + System.IO.Path.GetFileName(projectPath) + "\n");
+
+                            if (!Simulate)
+                            {
+                                project.Save();
+                            }
+                        }
+                        else
+                        {
+                            host.WriteMessage("[ ] Feature " + Action + " already enabled in project " + System.IO.Path.GetFileName(projectPath) + "\n");
+                        }
+
+                        collection.UnloadProject(project);
+                    }
+                    catch (Exception e)
+                    {
+                        host.WriteError(e + "\n");
+                    }
                 }
             }
 

@@ -18,35 +18,37 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var collection = new ProjectCollection();
-            foreach (var projectPath in GetProjectPaths())
+            using (var collection = new ProjectCollection())
             {
-                try
+                foreach (var projectPath in GetProjectPaths())
                 {
-                    var project = collection.LoadProject(projectPath);
-                    if (project.GeneratesPackage() || project.HasVersion())
+                    try
                     {
-                        var versions = BumpVersion(project, "Version", "1.0.0");
-
-                        host.WriteMessage("[x] Bumped version of " + System.IO.Path.GetFileName(projectPath) +
-                                          " from " + versions.Item2 +
-                                          " to " + versions.Item1 + "\n");
-
-                        if (!Simulate)
+                        var project = collection.LoadProject(projectPath);
+                        if (project.GeneratesPackage() || project.HasVersion())
                         {
-                            project.Save();
-                        }
+                            var versions = BumpVersion(project, "Version", "1.0.0");
 
-                        collection.UnloadProject(project);
+                            host.WriteMessage("[x] Bumped version of " + System.IO.Path.GetFileName(projectPath) +
+                                              " from " + versions.Item2 +
+                                              " to " + versions.Item1 + "\n");
+
+                            if (!Simulate)
+                            {
+                                project.Save();
+                            }
+
+                            collection.UnloadProject(project);
+                        }
+                        else
+                        {
+                            host.WriteMessage("[ ] Ignoring " + System.IO.Path.GetFileName(projectPath) + ": Not GeneratePackageOnBuild\n");
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        host.WriteMessage("[ ] Ignoring " + System.IO.Path.GetFileName(projectPath) + ": Not GeneratePackageOnBuild\n");
+                        host.WriteError(e + "\n");
                     }
-                }
-                catch (Exception e)
-                {
-                    host.WriteError(e + "\n");
                 }
             }
 

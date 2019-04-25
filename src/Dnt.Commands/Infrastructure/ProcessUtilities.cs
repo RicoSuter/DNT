@@ -42,16 +42,9 @@ namespace Dnt.Commands.Infrastructure
             await Task.Run(() => process.WaitForExit());
 
             if (process.ExitCode != 0)
+            {
                 throw new InvalidOperationException("Process execution failed: " + command);
-
-            //process.Exited += (sender, args) =>
-            //{
-            //    if (process.ExitCode != 0)
-            //        taskSource.SetException(new InvalidOperationException("Process execution failed: " + command));
-            //    else
-            //        taskSource.SetResult(null);
-            //};
-            //return taskSource.Task;
+            }
         }
     }
 }

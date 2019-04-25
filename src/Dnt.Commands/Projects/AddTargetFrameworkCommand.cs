@@ -20,76 +20,78 @@ namespace Dnt.Commands.Projects
                 return Task.FromResult<object>(null);
             }
 
-            var collection = new ProjectCollection();
-            foreach (var projectPath in GetProjectPaths())
+            using (var collection = new ProjectCollection())
             {
-                try
+                foreach (var projectPath in GetProjectPaths())
                 {
-                    var project = collection.LoadProject(projectPath);
-
-                    ProjectProperty targetFrameworksProperty = null;
-                    List<string> targetFrameworks = null;
-
-                    var targetFrameworkProperty = project.GetProperty("TargetFramework");
-                    if (targetFrameworkProperty != null)
+                    try
                     {
-                        var value = targetFrameworkProperty.EvaluatedValue;
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            targetFrameworks = new List<string> { targetFrameworkProperty.EvaluatedValue };
-                        }
-                        
-                        project.RemoveProperty(targetFrameworkProperty);
-                    }
-                    else
-                    {
-                        targetFrameworksProperty = project.GetProperty("TargetFrameworks");
-                        if (targetFrameworksProperty != null)
-                        {
-                            targetFrameworks = targetFrameworksProperty.EvaluatedValue
-                                .Split(';')
-                                .Where(f => !string.IsNullOrEmpty(f))
-                                .ToList();
-                        }
-                    }
+                        var project = collection.LoadProject(projectPath);
 
-                    if (targetFrameworks != null)
-                    {
-                        if (!targetFrameworks.Contains(TargetFramework))
-                        {
-                            targetFrameworks.Add(TargetFramework);
+                        ProjectProperty targetFrameworksProperty = null;
+                        List<string> targetFrameworks = null;
 
-                            if (targetFrameworksProperty != null)
+                        var targetFrameworkProperty = project.GetProperty("TargetFramework");
+                        if (targetFrameworkProperty != null)
+                        {
+                            var value = targetFrameworkProperty.EvaluatedValue;
+                            if (!string.IsNullOrEmpty(value))
                             {
-                                targetFrameworksProperty.UnevaluatedValue = string.Join(";", targetFrameworks);
-                            }
-                            else
-                            {
-                                project.SetProperty("TargetFrameworks", string.Join(";", targetFrameworks));
+                                targetFrameworks = new List<string> { targetFrameworkProperty.EvaluatedValue };
                             }
 
-                            host.WriteMessage("[x] Added target framework " + TargetFramework + " to " +
-                                System.IO.Path.GetFileName(projectPath) + "\n");
+                            project.RemoveProperty(targetFrameworkProperty);
                         }
                         else
                         {
-                            host.WriteMessage("[ ] Target framework " + TargetFramework + " already in project " +
+                            targetFrameworksProperty = project.GetProperty("TargetFrameworks");
+                            if (targetFrameworksProperty != null)
+                            {
+                                targetFrameworks = targetFrameworksProperty.EvaluatedValue
+                                    .Split(';')
+                                    .Where(f => !string.IsNullOrEmpty(f))
+                                    .ToList();
+                            }
+                        }
+
+                        if (targetFrameworks != null)
+                        {
+                            if (!targetFrameworks.Contains(TargetFramework))
+                            {
+                                targetFrameworks.Add(TargetFramework);
+
+                                if (targetFrameworksProperty != null)
+                                {
+                                    targetFrameworksProperty.UnevaluatedValue = string.Join(";", targetFrameworks);
+                                }
+                                else
+                                {
+                                    project.SetProperty("TargetFrameworks", string.Join(";", targetFrameworks));
+                                }
+
+                                host.WriteMessage("[x] Added target framework " + TargetFramework + " to " +
+                                    System.IO.Path.GetFileName(projectPath) + "\n");
+                            }
+                            else
+                            {
+                                host.WriteMessage("[ ] Target framework " + TargetFramework + " already in project " +
+                                    System.IO.Path.GetFileName(projectPath) + "\n");
+                            }
+                        }
+                        else
+                        {
+                            host.WriteMessage("[ ] Could not add target framework " + TargetFramework + " to " +
                                 System.IO.Path.GetFileName(projectPath) + "\n");
                         }
+
+                        project.Save();
+
+                        collection.UnloadProject(project);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        host.WriteMessage("[ ] Could not add target framework " + TargetFramework + " to " +
-                            System.IO.Path.GetFileName(projectPath) + "\n");
+                        host.WriteError(e + "\n");
                     }
-
-                    project.Save();
-
-                    collection.UnloadProject(project);
-                }
-                catch (Exception e)
-                {
-                    host.WriteError(e + "\n");
                 }
             }
 
