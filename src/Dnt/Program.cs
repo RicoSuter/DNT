@@ -39,7 +39,6 @@ namespace Dnt
 
         private static void SetMsBuildExePath()
         {
-#if NETCOREAPP
             try
             {
                 // See https://github.com/Microsoft/msbuild/issues/2532#issuecomment-381096259
@@ -51,24 +50,13 @@ namespace Dnt
                 var sdkPaths = Regex.Matches(output, "([0-9]+.[0-9]+.[0-9]+) \\[(.*)\\]").OfType<Match>()
                     .Select(m => Path.Combine(m.Groups[2].Value, m.Groups[1].Value, "MSBuild.dll"));
 
-                var sdkPath = sdkPaths.Last();
+                var sdkPath = sdkPaths.LastOrDefault() ?? Path.Combine(ProjectExtensions.GetToolsPath(), "msbuild.exe");
                 Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", sdkPath);
             }
             catch (Exception exception)
             {
                 ConsoleUtilities.Write("Could not set MSBUILD_EXE_PATH: " + exception + "\n\n");
             }
-#else
-            try
-            {
-                var sdkPath = Path.Combine(ProjectExtensions.GetToolsPath(), "msbuild.exe");
-                Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", sdkPath);
-            }
-            catch (Exception exception)
-            {
-                ConsoleUtilities.Write("Could not set MSBUILD_EXE_PATH: " + exception + "\n\n");
-            }
-#endif
         }
     }
 }
