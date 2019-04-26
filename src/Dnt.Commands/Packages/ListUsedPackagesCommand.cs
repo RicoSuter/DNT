@@ -64,14 +64,13 @@ namespace Dnt.Commands.Packages
         {
             host.WriteMessage($"Loading projects ");
 
-            using (var collection = new ProjectCollection())
+            foreach (var projectPath in GetProjectPaths())
             {
-                foreach (var projectPath in GetProjectPaths())
+                try
                 {
-                    try
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
                     {
-                        var project = collection.LoadProject(projectPath);
-                        foreach (var item in project.Items.Where(i => i.ItemType == "PackageReference").ToList())
+                        foreach (var item in projectInformation.Project.Items.Where(i => i.ItemType == "PackageReference").ToList())
                         {
                             var packageName = item.EvaluatedInclude;
                             var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Latest";
@@ -97,10 +96,10 @@ namespace Dnt.Commands.Packages
                             }
                         }
                     }
-                    catch (Exception e)
-                    {
-                        host.WriteError(e + "\n");
-                    }
+                }
+                catch (Exception e)
+                {
+                    host.WriteError(e + "\n");
                 }
             }
 

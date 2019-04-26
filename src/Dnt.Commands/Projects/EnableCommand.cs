@@ -14,13 +14,14 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            using (var collection = new ProjectCollection())
+
+            foreach (var projectPath in GetProjectPaths())
             {
-                foreach (var projectPath in GetProjectPaths())
+                try
                 {
-                    try
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
                     {
-                        var project = collection.LoadProject(projectPath);
+                        var project = projectInformation.Project;
 
                         var result = false;
                         switch (Action)
@@ -48,13 +49,11 @@ namespace Dnt.Commands.Projects
                         {
                             host.WriteMessage("[ ] Feature " + Action + " already enabled in project " + System.IO.Path.GetFileName(projectPath) + "\n");
                         }
-
-                        collection.UnloadProject(project);
                     }
-                    catch (Exception e)
-                    {
-                        host.WriteError(e + "\n");
-                    }
+                }
+                catch (Exception e)
+                {
+                    host.WriteError(e + "\n");
                 }
             }
 

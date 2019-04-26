@@ -18,16 +18,15 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            using (var collection = new ProjectCollection())
+            foreach (var projectPath in GetProjectPaths())
             {
-                foreach (var projectPath in GetProjectPaths())
+                try
                 {
-                    try
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
                     {
-                        var project = collection.LoadProject(projectPath);
-                        if (project.GeneratesPackage() || project.HasVersion())
+                        if (projectInformation.Project.GeneratesPackage() || projectInformation.Project.HasVersion())
                         {
-                            var versions = BumpVersion(project, "Version", "1.0.0");
+                            var versions = BumpVersion(projectInformation.Project, "Version", "1.0.0");
 
                             host.WriteMessage("[x] Bumped version of " + System.IO.Path.GetFileName(projectPath) +
                                               " from " + versions.Item2 +
@@ -35,20 +34,18 @@ namespace Dnt.Commands.Projects
 
                             if (!Simulate)
                             {
-                                project.Save();
+                                projectInformation.Project.Save();
                             }
-
-                            collection.UnloadProject(project);
                         }
                         else
                         {
                             host.WriteMessage("[ ] Ignoring " + System.IO.Path.GetFileName(projectPath) + ": Not GeneratePackageOnBuild\n");
                         }
                     }
-                    catch (Exception e)
-                    {
-                        host.WriteError(e + "\n");
-                    }
+                }
+                catch (Exception e)
+                {
+                    host.WriteError(e + "\n");
                 }
             }
 
