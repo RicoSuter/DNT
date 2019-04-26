@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <IsPackable>true</IsPackable>
     <AssemblyName>dnt</AssemblyName>
     <DevelopmentDependency>true</DevelopmentDependency>
@@ -29,7 +29,7 @@
     <PackageReference Include="NConsole" Version="3.12.6605.26941">
       <ExcludeAssets></ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
 </Project>

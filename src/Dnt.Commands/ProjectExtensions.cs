@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Dnt.Commands.Infrastructure;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Utilities;
 
@@ -55,11 +54,11 @@ namespace Dnt.Commands
 
         private static ProjectInformation GetLegacyProject(string projectPath)
         {
-            var toolsPath = GetToolsPath();
-            var globalProperties = GetLegacyGlobalProperties(projectPath, toolsPath);
+            var legacyToolsPath = GetToolsPath();
 
+            var globalProperties = GetLegacyGlobalProperties(projectPath, legacyToolsPath);
             var projectCollection = new ProjectCollection(globalProperties);
-            projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
+            projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, legacyToolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
             return new ProjectInformation(projectCollection, project, true);
@@ -67,9 +66,10 @@ namespace Dnt.Commands
 
         private static ProjectInformation GetSdkProject(string projectPath)
         {
-            var toolsPath = GetSdkBasePath(projectPath);
-            var globalProperties = GetSdkGlobalProperties(projectPath, toolsPath);
+            var legacyToolsPath = GetToolsPath();
+            var sdkToolsPath = GetSdkBasePath(projectPath);
 
+            var globalProperties = GetSdkGlobalProperties(projectPath, sdkToolsPath);
             Environment.SetEnvironmentVariable(
                 "MSBuildExtensionsPath",
                 globalProperties["MSBuildExtensionsPath"]);
@@ -78,20 +78,22 @@ namespace Dnt.Commands
                 globalProperties["MSBuildSDKsPath"]);
 
             var projectCollection = new ProjectCollection(globalProperties);
-
-            projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, toolsPath, projectCollection, string.Empty));
+            projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, legacyToolsPath, projectCollection, string.Empty));
+            projectCollection.AddToolset(new Toolset(ToolLocationHelper.CurrentToolsVersion, sdkToolsPath, projectCollection, string.Empty));
 
             var project = projectCollection.LoadProject(projectPath);
             return new ProjectInformation(projectCollection, project, false);
         }
 
-        private static string GetToolsPath()
+        public static string GetToolsPath()
         {
             var toolsPath = ToolLocationHelper.GetPathToBuildToolsFile("msbuild.exe", ToolLocationHelper.CurrentToolsVersion);
+
             if (string.IsNullOrEmpty(toolsPath))
             {
-                toolsPath = PollForToolsPath().FirstOrDefault();
+                toolsPath = GetToolsPaths().FirstOrDefault();
             }
+
             if (string.IsNullOrEmpty(toolsPath))
             {
                 throw new Exception("Could not locate the tools (MSBuild) path.");
@@ -100,16 +102,20 @@ namespace Dnt.Commands
             return Path.GetDirectoryName(toolsPath);
         }
 
-        private static string[] PollForToolsPath()
+        private static string[] GetToolsPaths()
         {
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
             return new[]
             {
+                Path.Combine(programFilesX86, @"Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"),
+                Path.Combine(programFilesX86, @"Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"),
+
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"),
+
                 Path.Combine(programFilesX86, @"MSBuild\14.0\Bin\MSBuild.exe"),
                 Path.Combine(programFilesX86, @"MSBuild\12.0\Bin\MSBuild.exe")
             }.Where(File.Exists).ToArray();
