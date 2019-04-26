@@ -20,13 +20,13 @@ namespace Dnt.Commands.Projects
                 return Task.FromResult<object>(null);
             }
 
-            using (var collection = new ProjectCollection())
+            foreach (var projectPath in GetProjectPaths())
             {
-                foreach (var projectPath in GetProjectPaths())
+                try
                 {
-                    try
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
                     {
-                        var project = collection.LoadProject(projectPath);
+                        var project = projectInformation.Project;
 
                         ProjectProperty targetFrameworksProperty = null;
                         List<string> targetFrameworks = null;
@@ -85,13 +85,11 @@ namespace Dnt.Commands.Projects
                         }
 
                         project.Save();
-
-                        collection.UnloadProject(project);
                     }
-                    catch (Exception e)
-                    {
-                        host.WriteError(e + "\n");
-                    }
+                }
+                catch (Exception e)
+                {
+                    host.WriteError(e + "\n");
                 }
             }
 

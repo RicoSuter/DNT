@@ -11,33 +11,30 @@ namespace Dnt.Commands.Projects
     {
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            using (var collection = new ProjectCollection())
+            foreach (var projectPath in GetProjectPaths())
             {
-                foreach (var projectPath in GetProjectPaths())
+                try
                 {
-                    try
+                    var projectDirectory = System.IO.Path.GetDirectoryName(projectPath);
+
+                    var binDirectory = System.IO.Path.Combine(projectDirectory, "bin");
+                    var objDirectory = System.IO.Path.Combine(projectDirectory, "obj");
+
+                    if (Directory.Exists(binDirectory))
                     {
-                        var projectDirectory = System.IO.Path.GetDirectoryName(projectPath);
-
-                        var binDirectory = System.IO.Path.Combine(projectDirectory, "bin");
-                        var objDirectory = System.IO.Path.Combine(projectDirectory, "obj");
-
-                        if (Directory.Exists(binDirectory))
-                        {
-                            Directory.Delete(binDirectory, true);
-                            host.WriteMessage("Deleted directory " + binDirectory + "\n");
-                        }
-
-                        if (Directory.Exists(objDirectory))
-                        {
-                            Directory.Delete(objDirectory, true);
-                            host.WriteMessage("Deleted directory " + binDirectory + "\n");
-                        }
+                        Directory.Delete(binDirectory, true);
+                        host.WriteMessage("Deleted directory " + binDirectory + "\n");
                     }
-                    catch (Exception e)
+
+                    if (Directory.Exists(objDirectory))
                     {
-                        host.WriteError(e + "\n");
+                        Directory.Delete(objDirectory, true);
+                        host.WriteMessage("Deleted directory " + binDirectory + "\n");
                     }
+                }
+                catch (Exception e)
+                {
+                    host.WriteError(e + "\n");
                 }
             }
 

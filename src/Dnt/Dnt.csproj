@@ -10,7 +10,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <PackageId>DNT</PackageId>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -20,7 +20,7 @@
     <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <OutputPath>..\Dnt.Npm\bin\binaries\NetCore21</OutputPath>
+    <OutputPath>..\Dnt.Npm\bin\binaries\NetCore22</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />

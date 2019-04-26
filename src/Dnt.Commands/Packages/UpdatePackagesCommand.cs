@@ -38,8 +38,7 @@ namespace Dnt.Commands.Packages
                 {
                     foreach (var projectPath in GetProjectPaths())
                     {
-                        projectCollection.LoadProject(projectPath);
-                        await UpgradeProjectPackagesAsync(projectCollection, host, projectPath, packageRegex, version);
+                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version);
                     }
                 }
             }
@@ -48,7 +47,7 @@ namespace Dnt.Commands.Packages
                 await Task.WhenAll(GetProjectPaths().Select(projectPath => Task.Run(async () =>
                 {
                     using (var projectCollection = new ProjectCollection())
-                        await UpgradeProjectPackagesAsync(projectCollection, host, projectPath, packageRegex, version);
+                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version);
                 }
                 )));
             }
@@ -56,23 +55,24 @@ namespace Dnt.Commands.Packages
             return null;
         }
 
-        private async Task UpgradeProjectPackagesAsync(ProjectCollection projectCollection, IConsoleHost host, string projectPath, Regex packageRegex, string version)
+        private async Task UpgradeProjectPackagesAsync(IConsoleHost host, string projectPath, Regex packageRegex, string version)
         {
             try
             {
-                var project = projectCollection.LoadProject(projectPath);
-
-                var packages = project.Items
-                    .Where(i => i.ItemType == "PackageReference" &&
-                                packageRegex.IsMatch(i.EvaluatedInclude) &&
-                                i.EvaluatedInclude != "Microsoft.NETCore.App")
-                    .Select(i => i.EvaluatedInclude)
-                    .ToList();
-
-                foreach (var package in packages)
+                using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
                 {
-                    await ExecuteCommandAsync("dotnet add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
-                }
+                    var packages = projectInformation.Project.Items
+                        .Where(i => i.ItemType == "PackageReference" &&
+                                    packageRegex.IsMatch(i.EvaluatedInclude) &&
+                                    i.EvaluatedInclude != "Microsoft.NETCore.App")
+                        .Select(i => i.EvaluatedInclude)
+                        .ToList();
+
+                    foreach (var package in packages)
+                    {
+                        await ExecuteCommandAsync("dotnet add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
+                    }
+                }               
             }
             catch (Exception e)
             {

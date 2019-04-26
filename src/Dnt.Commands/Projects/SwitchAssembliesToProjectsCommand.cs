@@ -13,29 +13,10 @@ namespace Dnt.Commands.Projects
     {
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            using (var projects = LoadProjects())
-            {
-                ReplaceAssemblyReferencesWithProjects(projects, host);
-            }
+            var projects = GetProjectPaths().Select(p => ProjectExtensions.LoadProject(p)).ToList();
+            var projectNames = projects.Select(p => System.IO.Path.GetFileNameWithoutExtension(p.Project.FullPath));
 
-            return Task.FromResult<object>(null);
-        }
-
-        private ProjectCollection LoadProjects()
-        {
-            var collection = new ProjectCollection();
-            foreach (var projectPath in GetProjectPaths())
-            {
-                collection.LoadProject(projectPath);
-            }
-
-            return collection;
-        }
-
-        private static void ReplaceAssemblyReferencesWithProjects(ProjectCollection projects, IConsoleHost host)
-        {
-            var projectNames = projects.LoadedProjects.Select(p => System.IO.Path.GetFileNameWithoutExtension(p.FullPath));
-            foreach (var project in projects.LoadedProjects)
+            foreach (var project in projects.Select(p => p.Project))
             {
                 try
                 {
@@ -49,8 +30,8 @@ namespace Dnt.Commands.Projects
                         {
                             assemblyReferencesToRemove.Add(reference);
 
-                            var projectToReference = projects.LoadedProjects.First(p => System.IO.Path.GetFileNameWithoutExtension(p.FullPath) == reference.EvaluatedInclude.Split(',').First());
-                            newProjectsToReference.Add(projectToReference);
+                            var projectToReference = projects.First(p => System.IO.Path.GetFileNameWithoutExtension(p.Project.FullPath) == reference.EvaluatedInclude.Split(',').First());
+                            newProjectsToReference.Add(projectToReference.Project);
                         }
 
                         foreach (var item in assemblyReferencesToRemove)
@@ -80,6 +61,13 @@ namespace Dnt.Commands.Projects
                     host.WriteError("The project '" + project.FullPath + "' could not be loaded: " + e.Message + "\n");
                 }
             }
+
+            foreach (var project in projects)
+            {
+                project.Dispose();
+            }
+
+            return Task.FromResult<object>(null);
         }
     }
 }
