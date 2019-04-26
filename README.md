@@ -9,8 +9,9 @@
 ## Installation
 
 ### .NET Core global tool
+#### Requires .NET Core 2.2+ and Visual Studio 2019
 
-Install .NET Core global tool (.NET Core 2.1+ only):
+Install .NET Core global tool:
 
 ```
 dotnet tool install -g dnt
@@ -29,6 +30,7 @@ dotnet tool uninstall -g dnt
 ```
 
 ### NPM CLI package
+#### Requires .NET Core 2.2+ or NetFX 4.7.2 and Visual Studio 2019
 
 Globally install/update via NPM (.NET 4.6.2+ and .NET Core 2.1+):
 
