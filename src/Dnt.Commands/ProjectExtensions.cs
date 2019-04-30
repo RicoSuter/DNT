@@ -69,7 +69,11 @@ namespace Dnt.Commands
             var legacyToolsPath = GetToolsPath();
             var sdkToolsPath = GetSdkBasePath(projectPath);
 
+            var legacyProperties = GetLegacyGlobalProperties(projectPath, legacyToolsPath);
             var globalProperties = GetSdkGlobalProperties(projectPath, sdkToolsPath);
+
+            globalProperties.Add("MSBuildExtensionsPath32", legacyProperties["MSBuildExtensionsPath32"]);
+
             Environment.SetEnvironmentVariable(
                 "MSBuildExtensionsPath",
                 globalProperties["MSBuildExtensionsPath"]);
