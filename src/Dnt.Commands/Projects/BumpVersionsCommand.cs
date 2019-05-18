@@ -13,8 +13,9 @@ namespace Dnt.Commands.Projects
         [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision).", IsRequired = true)]
         public string Action { get; set; }
 
-        [Argument(Position = 2, Description = "The specified version number of the given action.", IsRequired = false)]
-        public int Number { get; set; } = -1;
+        [Argument(Position = 2, Description = "The specified version number of the given action - " +
+            "should be a number, otherwise takes the last segment after . to support the Azure DevOps $(Build.BuildNumber) variable.", IsRequired = false)]
+        public string Number { get; set; } = "-1";
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
@@ -71,22 +72,23 @@ namespace Dnt.Commands.Projects
         private string GetBumpedVersion(string version)
         {
             var segments = version.Split('.');
+            var number = long.Parse(Number.Split('.').Last()) % short.MaxValue;
 
             if (Action == "major")
             {
-                return $"{(Number != -1 ? Number : int.Parse(segments[0]) + 1)}.0.0{(segments.Length >= 4 ? ".0" : "")}";
+                return $"{(number != -1 ? number : int.Parse(segments[0]) + 1)}.0.0{(segments.Length >= 4 ? ".0" : "")}";
             }
             else if (Action == "minor")
             {
-                return $"{segments[0]}.{(Number != -1 ? Number : int.Parse(segments[1]) + 1)}.0{(segments.Length >= 4 ? ".0" : "")}";
+                return $"{segments[0]}.{(number != -1 ? number : int.Parse(segments[1]) + 1)}.0{(segments.Length >= 4 ? ".0" : "")}";
             }
             else if (Action == "patch")
             {
-                return $"{segments[0]}.{segments[1]}.{(Number != -1 ? Number : int.Parse(segments[2]) + 1)}{(segments.Length >= 4 ? ".0" : "")}";
+                return $"{segments[0]}.{segments[1]}.{(number != -1 ? number : int.Parse(segments[2]) + 1)}{(segments.Length >= 4 ? ".0" : "")}";
             }
             else
             {
-                return $"{segments[0]}.{segments[1]}.{segments[2]}.{(Number != -1 ? Number : (segments.Length >= 4 ? int.Parse(segments[3]) + 1 : 1))}";
+                return $"{segments[0]}.{segments[1]}.{segments[2]}.{(number != -1 ? number : (segments.Length >= 4 ? int.Parse(segments[3]) + 1 : 1))}";
             }
         }
     }
