@@ -71,15 +71,15 @@ namespace Dnt.Commands.Projects
 
         private string GetBumpedVersion(string version)
         {
-            var segments = version.Split('.');
+            var segments = version.Split('.', '-', '+');
 
             if (Action == "preview")
             {
-                return $"{segments[0]}.{segments[1]}.{segments[2]}-" + Number;
+                return $"{segments[0]}.{segments[1]}.{segments[2]}{(segments.Length >= 4 ? "." + segments[3] : "")}-" + Number;
             }
             else if (Action == "meta")
             {
-                return $"{segments[0]}.{segments[1]}.{segments[2]}+" + Number;
+                return $"{segments[0]}.{segments[1]}.{segments[2]}{(segments.Length >= 4 ? "." + segments[3] : "")}+" + Number;
             }
             else
             {
