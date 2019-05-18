@@ -10,7 +10,7 @@ namespace Dnt.Commands.Projects
                                                    "Only projects with GeneratePackageOnBuild set are being processed.")]
     public class BumpVersionsCommand : ProjectCommandBase
     {
-        [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision).", IsRequired = true)]
+        [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision|preview|meta).", IsRequired = true)]
         public string Action { get; set; }
 
         [Argument(Position = 2, Description = "The specified version number of the given action - " +
@@ -72,23 +72,34 @@ namespace Dnt.Commands.Projects
         private string GetBumpedVersion(string version)
         {
             var segments = version.Split('.');
-            var number = long.Parse(Number.Split('.').Last()) % short.MaxValue;
 
-            if (Action == "major")
+            if (Action == "preview")
             {
-                return $"{(number != -1 ? number : int.Parse(segments[0]) + 1)}.0.0{(segments.Length >= 4 ? ".0" : "")}";
+                return $"{segments[0]}.{segments[1]}.{segments[2]}-" + Number;
             }
-            else if (Action == "minor")
+            else if (Action == "meta")
             {
-                return $"{segments[0]}.{(number != -1 ? number : int.Parse(segments[1]) + 1)}.0{(segments.Length >= 4 ? ".0" : "")}";
-            }
-            else if (Action == "patch")
-            {
-                return $"{segments[0]}.{segments[1]}.{(number != -1 ? number : int.Parse(segments[2]) + 1)}{(segments.Length >= 4 ? ".0" : "")}";
+                return $"{segments[0]}.{segments[1]}.{segments[2]}+" + Number;
             }
             else
             {
-                return $"{segments[0]}.{segments[1]}.{segments[2]}.{(number != -1 ? number : (segments.Length >= 4 ? int.Parse(segments[3]) + 1 : 1))}";
+                var number = long.Parse(Number.Split('.').Last()) % short.MaxValue;
+                if (Action == "major")
+                {
+                    return $"{(number != -1 ? number : int.Parse(segments[0]) + 1)}.0.0{(segments.Length >= 4 ? ".0" : "")}";
+                }
+                else if (Action == "minor")
+                {
+                    return $"{segments[0]}.{(number != -1 ? number : int.Parse(segments[1]) + 1)}.0{(segments.Length >= 4 ? ".0" : "")}";
+                }
+                else if (Action == "patch")
+                {
+                    return $"{segments[0]}.{segments[1]}.{(number != -1 ? number : int.Parse(segments[2]) + 1)}{(segments.Length >= 4 ? ".0" : "")}";
+                }
+                else
+                {
+                    return $"{segments[0]}.{segments[1]}.{segments[2]}.{(number != -1 ? number : (segments.Length >= 4 ? int.Parse(segments[3]) + 1 : 1))}";
+                }
             }
         }
     }
