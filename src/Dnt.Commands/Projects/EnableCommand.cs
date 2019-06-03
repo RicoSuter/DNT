@@ -27,7 +27,7 @@ namespace Dnt.Commands.Projects
                         switch (Action)
                         {
                             case "warnaserror":
-                                result = EnableBooleanProperty(project, "WarningsAsErrors");
+                                result = EnableBooleanProperty(project, "TreatWarningsAsErrors");
                                 break;
                             case "xmldocs":
                                 result = EnableXmlDocs(project);
