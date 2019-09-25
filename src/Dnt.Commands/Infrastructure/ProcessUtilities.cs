@@ -6,15 +6,15 @@ namespace Dnt.Commands.Infrastructure
 {
     public static class ProcessUtilities
     {
-        public static async Task ExecuteAsync(string command, bool verbose)
+        public static async Task ExecuteAsync(string command, string arguments, bool verbose)
         {
             var taskSource = new TaskCompletionSource<object>();
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "cmd.exe",
-                    Arguments = "/c " + command,
+                    FileName = command,
+                    Arguments = arguments,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

@@ -39,7 +39,7 @@ namespace Dnt.Commands.Packages
                 {
                     try
                     {
-                        await ExecuteCommandAsync("dotnet add \"" + projectPath + "\" package " + Package + version, host);
+                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package " + Package + version, host);
                     }
                     catch (Exception e)
                     {
