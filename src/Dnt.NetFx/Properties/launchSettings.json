@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Dnt": {
+    "Dnt.NetFx": {
       "commandName": "Project",
       "commandLineArgs": "bump-versions patch",
       "workingDirectory": "C:\\Data\\Projects\\NJsonSchema\\src"
