@@ -92,7 +92,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                await ExecuteCommandAsync("dotnet sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects), host);
+                await ExecuteCommandAsync("dotnet", "sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects), host);
             }
         }
 

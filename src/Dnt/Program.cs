@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Dnt.Commands;
 using Dnt.Commands.Infrastructure;
+
+using Microsoft.Build.Locator;
+
 using NConsole;
 
 namespace Dnt
@@ -21,7 +24,9 @@ namespace Dnt
             ConsoleUtilities.Write("Binary: " + assembly.Location + "\n\n");
             try
             {
-                SetMsBuildExePath();
+                // MSBuildLocator takes care of finding the default MSBuild / Visual Studio instance
+                // and setting up all necessary environment variables and paths for MSBuild.
+                MSBuildLocator.RegisterDefaults();
 
                 var processor = new CommandLineProcessor(new CoreConsoleHost());
                 processor.RegisterCommandsFromAssembly(typeof(CommandBase).Assembly);
@@ -35,28 +40,6 @@ namespace Dnt
 
             if (Debugger.IsAttached)
                 Console.ReadLine();
-        }
-
-        private static void SetMsBuildExePath()
-        {
-            try
-            {
-                // See https://github.com/Microsoft/msbuild/issues/2532#issuecomment-381096259
-
-                var process = Process.Start(new ProcessStartInfo("dotnet", "--list-sdks") { UseShellExecute = false, RedirectStandardOutput = true });
-                process.WaitForExit(1000);
-
-                var output = process.StandardOutput.ReadToEnd();
-                var sdkPaths = Regex.Matches(output, "([0-9]+.[0-9]+.[0-9]+) \\[(.*)\\]").OfType<Match>()
-                    .Select(m => Path.Combine(m.Groups[2].Value, m.Groups[1].Value, "MSBuild.dll"));
-
-                var sdkPath = sdkPaths.LastOrDefault() ?? Path.Combine(ProjectExtensions.GetToolsPath(), "msbuild.exe");
-                Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", sdkPath);
-            }
-            catch (Exception exception)
-            {
-                ConsoleUtilities.Write("Could not set MSBUILD_EXE_PATH: " + exception + "\n\n");
-            }
         }
     }
 }
