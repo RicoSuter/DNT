@@ -70,7 +70,7 @@ namespace Dnt.Commands.Packages
 
                     foreach (var package in packages)
                     {
-                        await ExecuteCommandAsync("dotnet add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
+                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
                     }
                 }               
             }
