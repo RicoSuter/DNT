@@ -29,7 +29,7 @@ namespace Dnt.Commands.Projects
                     if (Directory.Exists(objDirectory))
                     {
                         Directory.Delete(objDirectory, true);
-                        host.WriteMessage("Deleted directory " + binDirectory + "\n");
+                        host.WriteMessage("Deleted directory " + objDirectory + "\n");
                     }
                 }
                 catch (Exception e)
