@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-var defaultCoreVersion = "22";
-var supportedCoreVersions = ["22"];
+var defaultCoreVersion = "31";
+var supportedCoreVersions = ["31", "30", "22", "21"];
 
 // Initialize
 process.title = 'dnt';
