@@ -82,7 +82,7 @@ namespace Dnt.Commands.Packages
                 foreach (var path in mapping.Value)
                 {
                     var project = solution.ProjectsInOrder.FirstOrDefault
-                        (p => configuration.GetActualPath(p.RelativePath) == configuration.GetActualPath(path));
+                        (p => PathUtilities.ToAbsolutePath(p.RelativePath, Path.GetDirectoryName(configuration.ActualSolution)) == configuration.GetActualPath(path));
                     if (project != null)
                     {
                         projects.Add("\"" + configuration.GetActualPath(path) + "\"");
