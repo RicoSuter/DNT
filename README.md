@@ -64,7 +64,7 @@ Available commands:
 
 Possible scenarios to use the tools: 
 
-- [Azure DevOps: A way to version and publish .NET packages from a GitHub repository](https://blog.rsuter.com/azure-devops-way-to-version-and-publish-dotnet-packages-from-github-repository/)
+- [Azure DevOps: A way to version and publish .NET packages from a GitHub repository](https://blog.rsuter.com/azure-devops-my-versioning-flow-to-publish-dotnet-packages-from-github-repository/)
 
 ## Package Commands
 
