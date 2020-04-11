@@ -79,8 +79,7 @@ namespace Dnt.Commands.Packages
                     }
                     catch (Exception e)
                     {
-                        host.WriteError("The project '" + solutionProject.AbsolutePath + "' could not be loaded: " +
-                                        e.Message + "\n" + (e.InnerException == null ? "" : "\nDetails: " + e.InnerException.Message + "\n"));
+                        host.WriteError($"The project '{solutionProject.AbsolutePath}' could not be loaded: {e}\n");
                     }
                 }
             }
