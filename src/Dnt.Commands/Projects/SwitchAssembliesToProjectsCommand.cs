@@ -58,7 +58,7 @@ namespace Dnt.Commands.Projects
                 }
                 catch (Exception e)
                 {
-                    host.WriteError("The project '" + project.FullPath + "' could not be loaded: " + e.Message + "\n");
+                    host.WriteError($"The project '{project.FullPath}' could not be loaded: {e}\n");
                 }
             }
 
