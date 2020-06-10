@@ -274,6 +274,18 @@ Handle all warnings as errors in all selected projects:
 dnt enable warnaserror
 ```
 
+### nowarn
+
+Adds a diagnostic id to the `<NoWarn>` tag.
+
+**Samples:**
+
+Disable "Missing XML comment for publicly visible type or member" warnings in all selected projects:
+
+```
+dnt nowarn CS1591
+```
+
 ### add-target-framework
 
 Add another target framework to the selected projects.
