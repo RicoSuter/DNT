@@ -276,7 +276,7 @@ dnt enable warnaserror
 
 ### nowarn
 
-Adds a diagnostic id to the `<NoWarn>` tag.
+Adds a diagnostic id to the `<NoWarn>` tag (supports muliple ids, semicolon separated).
 
 **Samples:**
 
