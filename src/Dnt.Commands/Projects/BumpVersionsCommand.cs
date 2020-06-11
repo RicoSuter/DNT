@@ -10,7 +10,7 @@ namespace Dnt.Commands.Projects
                                                    "Only projects with GeneratePackageOnBuild set are being processed.")]
     public class BumpVersionsCommand : ProjectCommandBase
     {
-        [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision|preview|meta).", IsRequired = true)]
+        [Argument(Position = 1, Description = "The version part to update (major|minor|patch|revision|preview|meta|replace).", IsRequired = true)]
         public string Action { get; set; }
 
         [Argument(Position = 2, Description = "The specified version number of the given action - " +
@@ -80,6 +80,11 @@ namespace Dnt.Commands.Projects
             else if (Action == "meta")
             {
                 return $"{segments[0]}.{segments[1]}.{segments[2]}{(segments.Length >= 4 ? "." + segments[3] : "")}+" + Number;
+            }
+            else if (Action == "replace")
+            {
+                var newSegments = Number.Split('.');
+                return $"{newSegments[0] ?? "1"}.{(newSegments.Length > 1 ? newSegments[1] : "0" )}.{(newSegments.Length > 2 ? newSegments[2] : "0")}{(newSegments.Length >= 4 ? "." + newSegments[3] : "")}";
             }
             else
             {
