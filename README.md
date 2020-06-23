@@ -312,6 +312,41 @@ dnt add-target-framework netstandard2.0
 
 Deletes all /bin and /obj directories of the selected projects.
 
+### change-versions
+
+Replaces or sets the package version of the selected projects.  Projects must have the GeneratePackageOnBuild flag set.
+
+**Command:**
+
+```
+dnt change-versions version [replace|force]
+```
+
+**Parameters:**
+
+- Version: The full version number using the format 'major.minor[.patch][.revision]'. Version will be padded to three parts.
+- Action: Action to perform (replace|force). replace (default) = Only set for projects with an existing version, force = Set for all projects even if version is missing or blank
+
+**Samples:**
+
+Replace projects with an existing version tag with 1.0.1:
+
+```
+dnt change-version 1.0.1
+```
+
+Force set all projects to 1.2.0
+
+```
+dnt change-version 1.2 force
+```
+
+Replace version with a long version:
+
+```
+dnt change-version 1.2.3.4-PreRelease1 replace
+```
+
 # DNT development and testing
 
 It is recommended to add the debug output path "DNT/src/Dnt.NetFx/bin/Debug" to the Path environment variable, or directly start the app with a command.
