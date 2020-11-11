@@ -332,19 +332,19 @@ dnt change-versions version [replace|force]
 Replace projects with an existing version tag with 1.0.1:
 
 ```
-dnt change-version 1.0.1
+dnt change-versions 1.0.1
 ```
 
 Force set all projects to 1.2.0
 
 ```
-dnt change-version 1.2 force
+dnt change-versions 1.2 force
 ```
 
 Replace version with a long version:
 
 ```
-dnt change-version 1.2.3.4-PreRelease1 replace
+dnt change-versions 1.2.3.4-PreRelease1 replace
 ```
 
 # DNT development and testing
