@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 "use strict";
 
-var defaultCoreVersion = "31";
-var supportedCoreVersions = ["31", "30", "22", "21"];
+var defaultCoreVersion = "Core31";
+var supportedCoreVersions = ["50", "Core31", "Core30", "Core22", "Core21"];
 
 // Initialize
 process.title = 'dnt';
@@ -30,19 +30,19 @@ if (hasFullDotNet && args.toLowerCase().indexOf("/runtime:netcore") == -1) {
     var code = c.execSync(cmd, { stdio: [0, 1, 2] });
 } else {
     // Run .NET Core version
-    var defaultCmd = 'dotnet "' + __dirname + '/binaries/NetCore' + defaultCoreVersion + '/dnt.dll" ' + args;
+    var defaultCmd = 'dotnet "' + __dirname + '/binaries/Net' + defaultCoreVersion + '/dnt.dll" ' + args;
     var infoCmd = "dotnet --version";
     c.exec(infoCmd, (error, stdout, stderr) => {
         for (let version of supportedCoreVersions) {
-            var coreCmd = 'dotnet "' + __dirname + '/binaries/NetCore' + version + '/dnt.dll" ' + args;
+            var coreCmd = 'dotnet "' + __dirname + '/binaries/Net' + version + '/dnt.dll" ' + args;
 
-            if (args.toLowerCase().indexOf("/runtime:netcore" + version) != -1) {
+            if (args.toLowerCase().indexOf("/runtime:net" + version.toLocaleLowerCase()) != -1) {
                 c.execSync(coreCmd, { stdio: [0, 1, 2] });
                 return;
             } else {
                 if (!error) {
                     var coreVersion = stdout;
-                    if (coreVersion.indexOf(version + ".0") !== -1) {
+                    if (coreVersion.indexOf(version.replace('Core', '') + ".0") !== -1) {
                         c.execSync(coreCmd, { stdio: [0, 1, 2] });
                         return;
                     }
