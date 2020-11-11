@@ -274,6 +274,18 @@ Handle all warnings as errors in all selected projects:
 dnt enable warnaserror
 ```
 
+### nowarn
+
+Adds a diagnostic id to the `<NoWarn>` tag (supports muliple ids, semicolon separated).
+
+**Samples:**
+
+Disable "Missing XML comment for publicly visible type or member" warnings in all selected projects:
+
+```
+dnt nowarn CS1591
+```
+
 ### add-target-framework
 
 Add another target framework to the selected projects.
@@ -299,6 +311,41 @@ dnt add-target-framework netstandard2.0
 ### clean
 
 Deletes all /bin and /obj directories of the selected projects.
+
+### change-versions
+
+Replaces or sets the package version of the selected projects.  Projects must have the GeneratePackageOnBuild flag set.
+
+**Command:**
+
+```
+dnt change-versions version [replace|force]
+```
+
+**Parameters:**
+
+- Version: The full version number using the format 'major.minor[.patch][.revision]'. Version will be padded to three parts.
+- Action: Action to perform (replace|force). replace (default) = Only set for projects with an existing version, force = Set for all projects even if version is missing or blank
+
+**Samples:**
+
+Replace projects with an existing version tag with 1.0.1:
+
+```
+dnt change-versions 1.0.1
+```
+
+Force set all projects to 1.2.0
+
+```
+dnt change-versions 1.2 force
+```
+
+Replace version with a long version:
+
+```
+dnt change-versions 1.2.3.4-PreRelease1 replace
+```
 
 # DNT development and testing
 
