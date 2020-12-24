@@ -56,7 +56,7 @@ namespace Dnt.Commands.Packages
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             foreach (var solutionProject in solution.ProjectsInOrder)
             {
-                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder)
+                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder && solutionProject.ProjectType != SolutionProjectType.Unknown)
                 {
                     try
                     {
