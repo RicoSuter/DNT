@@ -19,7 +19,11 @@ namespace Dnt.Commands.Packages
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
+            var configuration = ReferenceSwitcherConfiguration.Load(Configuration, host);
+            if (configuration == null)
+            {
+                return null;
+            }
 
             await AddProjectsToSolutionAsync(configuration, host);
             SwitchToProjects(configuration, host);
