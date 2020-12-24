@@ -11,15 +11,19 @@ using NConsole;
 
 namespace Dnt.Commands.Packages
 {
-    [Command(Name = "switch-to-packages")]
+    [Command(Name = "switch-to-packages", Description = "Switch project references to NuGet references")]
     public class SwitchProjectsToPackagesCommand : CommandBase
     {
-        [Argument(Position = 1)]
-        public string Configuration { get; set; }
+        [Argument(Position = 1, IsRequired = false, Description = "Configuration .json file")]
+        public string Configuration { get; set; } = "switcher.json";
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
+            var configuration = ReferenceSwitcherConfiguration.Load(Configuration, host);
+            if (configuration == null)
+            {
+                return null;
+            }
 
             SwitchToPackages(host, configuration);
             await RemoveProjectsFromSolutionAsync(configuration, host);

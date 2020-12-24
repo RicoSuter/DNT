@@ -176,7 +176,13 @@ Create a `switcher.json` file and specify the solution to look for projects, and
 Then switch to projects in the solution: 
 
 ```
-dnt switch-to-projects switcher.json
+dnt switch-to-projects
+```
+
+The command looks for `switcher.json` configuration file by default, but you can specify your own file:
+
+```
+dnt switch-to-projects switch-config.json
 ```
 
 Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
@@ -186,7 +192,7 @@ Now all NJsonSchema package references in the NSwag solution are replaced by loc
 After implementing and testing, switch back to NuGet references and update to the latest version: 
 
 ```
-dnt switch-to-packages switcher.json
+dnt switch-to-packages
 dnt update-packages NJsonSchema*
 ```
 
