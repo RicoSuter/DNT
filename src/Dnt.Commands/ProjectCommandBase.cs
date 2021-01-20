@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
@@ -26,6 +27,21 @@ namespace Dnt.Commands
 
             var path = Directory.Exists(Path) ? Path : Directory.GetCurrentDirectory();
             return Directory.GetFiles(path, "*.csproj", SearchOption.AllDirectories);
+        }
+
+        protected IDictionary<string, string> TryGetGlobalProperties()
+        {
+            if (PathIsSolutionFile())
+            {
+                return ProjectExtensions.GetGlobalProperties(System.IO.Path.GetFullPath(Path));
+            }
+
+            return null;
+        }
+
+        private bool PathIsSolutionFile()
+        {
+            return File.Exists(Path) && Path.EndsWith(".sln");
         }
     }
 }

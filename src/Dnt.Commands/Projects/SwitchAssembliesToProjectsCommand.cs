@@ -13,14 +13,16 @@ namespace Dnt.Commands.Projects
     {
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var projects = GetProjectPaths().Select(p => ProjectExtensions.LoadProject(p)).ToList();
+            var globalProperties = TryGetGlobalProperties();
+
+            var projects = GetProjectPaths().Select(p => ProjectExtensions.LoadProject(p, globalProperties)).ToList();
             var projectNames = projects.Select(p => System.IO.Path.GetFileNameWithoutExtension(p.Project.FullPath));
 
             foreach (var project in projects.Select(p => p.Project))
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(project.FullPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(project.FullPath, globalProperties))
                     {
                         var newProjectsToReference = new List<Project>();
                         var assemblyReferencesToRemove = new List<ProjectItem>();

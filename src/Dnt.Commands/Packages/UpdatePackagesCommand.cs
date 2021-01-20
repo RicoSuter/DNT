@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace Dnt.Commands.Packages
                     Version;
             }
 
+            var globalProperties = TryGetGlobalProperties();
+
             var packageRegex = new Regex("^" + Package.Replace(".", "\\.").Replace("*", ".*") + "$");
             if (NoParallel)
             {
@@ -38,7 +41,7 @@ namespace Dnt.Commands.Packages
                 {
                     foreach (var projectPath in GetProjectPaths())
                     {
-                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version);
+                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version, globalProperties);
                     }
                 }
             }
@@ -47,7 +50,7 @@ namespace Dnt.Commands.Packages
                 await Task.WhenAll(GetProjectPaths().Select(projectPath => Task.Run(async () =>
                 {
                     using (var projectCollection = new ProjectCollection())
-                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version);
+                        await UpgradeProjectPackagesAsync(host, projectPath, packageRegex, version, globalProperties);
                 }
                 )));
             }
@@ -55,11 +58,11 @@ namespace Dnt.Commands.Packages
             return null;
         }
 
-        private async Task UpgradeProjectPackagesAsync(IConsoleHost host, string projectPath, Regex packageRegex, string version)
+        private async Task UpgradeProjectPackagesAsync(IConsoleHost host, string projectPath, Regex packageRegex, string version, IDictionary<string, string> globalProperties)
         {
             try
             {
-                using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
+                using (var projectInformation = ProjectExtensions.LoadProject(projectPath, globalProperties))
                 {
                     var packages = projectInformation.Project.Items
                         .Where(i => i.ItemType == "PackageReference" &&
@@ -72,7 +75,7 @@ namespace Dnt.Commands.Packages
                     {
                         await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
                     }
-                }               
+                }
             }
             catch (Exception e)
             {

@@ -13,12 +13,13 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
+            var globalProperties = TryGetGlobalProperties();
 
             foreach (var projectPath in GetProjectPaths())
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath, globalProperties))
                     {
                         var project = projectInformation.Project;
 
