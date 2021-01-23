@@ -37,6 +37,7 @@ namespace Dnt.Commands.Packages
         private static void SwitchToPackages(IConsoleHost host, ReferenceSwitcherConfiguration configuration)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
+            var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
             var mappedProjectFilePaths = configuration.Mappings.Values
                      .SelectMany(x => x)
                      .Select(p => Path.GetFileName(p))
@@ -49,7 +50,7 @@ namespace Dnt.Commands.Packages
                 {
                     try
                     {
-                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath))
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath, globalProperties))
                         {
                             foreach (var mapping in configuration.Mappings)
                             {

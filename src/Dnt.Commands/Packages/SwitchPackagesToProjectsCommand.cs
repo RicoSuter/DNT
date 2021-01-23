@@ -58,13 +58,15 @@ namespace Dnt.Commands.Packages
         private static void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
+            var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
+
             foreach (var solutionProject in solution.ProjectsInOrder)
             {
                 if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder && solutionProject.ProjectType != SolutionProjectType.Unknown)
                 {
                     try
                     {
-                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath))
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath, globalProperties))
                         {
                             foreach (var mapping in configuration.Mappings)
                             {

@@ -23,7 +23,7 @@ namespace Dnt.Commands.Projects
 
         public override Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-           
+
             if (Version.IndexOf(".") < 0)
             {
                 host.WriteError("Version number must include at least two parts \n");
@@ -32,11 +32,13 @@ namespace Dnt.Commands.Projects
 
             bool isReplaceOnly = !ACTION_FORCE.Equals(Action, StringComparison.InvariantCultureIgnoreCase);
 
+            var globalProperties = TryGetGlobalProperties();
+
             foreach (var projectPath in GetProjectPaths())
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath, globalProperties))
                     {
                         bool projectHasVersion = projectInformation.Project.HasVersion();
                         bool projectGeneratesPackage = projectInformation.Project.GeneratesPackage();
@@ -60,7 +62,7 @@ namespace Dnt.Commands.Projects
                             {
                                 host.WriteMessage($"[ ] Skipping {System.IO.Path.GetFileName(projectPath)} is already set to {versions.Item1}\n");
                             }
-                            
+
                         }
                         else
                         {

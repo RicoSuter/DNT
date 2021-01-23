@@ -20,11 +20,13 @@ namespace Dnt.Commands.Projects
                 return Task.FromResult<object>(null);
             }
 
+            var globalProperties = TryGetGlobalProperties();
+
             foreach (var projectPath in GetProjectPaths())
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath, globalProperties))
                     {
                         var project = projectInformation.Project;
 
