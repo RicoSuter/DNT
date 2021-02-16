@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Pkg_4</id>
+    <version>1.0.0.0</version>
+    <authors>Testing</authors>
+    <owners>
+    </owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Testing package</description>
+  </metadata>
+  <files>
+    <file src="ClassLibrary10/bin/Debug/ClassLibrary10.dll" target="lib/net472" />
+    <file src="..\**\*.cs" target="src" />
+  </files>
+</package>

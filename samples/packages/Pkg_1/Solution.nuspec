@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Pkg_1</id>
+    <version>1.0.0.0</version>
+    <authors>Testing</authors>
+    <owners>
+    </owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Testing package</description>
+    <releaseNotes></releaseNotes>
+    <copyright></copyright>
+    <tags>
+    </tags>
+    <dependencies>
+      <dependency id="Pkg_3" version="1.0.0" />
+	  <dependency id="Pkg_4" version="1.0.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="ClassLibrary1/bin/Debug/ClassLibrary1.dll" target="lib/net472" />
+    <file src="ClassLibrary2/bin/Debug/ClassLibrary2.dll" target="lib/net472" />
+    <file src="..\**\*.cs" target="src" />
+  </files>
+</package>
