@@ -2,7 +2,7 @@
 	"solution": "Sln_1.sln",
 	"mappings":
 	{
-		"Pkg_2": "..\..\packages\Pkg_2\ClassLibrary3\ClassLibrary3\csprj" 
+		"Pkg_2": "..\..\packages\Pkg_2\ClassLibrary3\ClassLibrary3\csprj", 
 		"Pkg_10": "..\..\packages\Pkg_4\ClassLibrary3\ClassLibrary10\csprj" 
 	}
 }
