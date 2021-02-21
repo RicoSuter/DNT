@@ -1,1 +1,1 @@
-dnt switch-to-projects
+dnt switch-to-projects switcher.json

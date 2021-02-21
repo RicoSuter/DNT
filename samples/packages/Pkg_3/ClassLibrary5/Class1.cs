@@ -8,5 +8,9 @@ namespace ClassLibrary5
 {
     public class Class1
     {
+        public void Hello()
+        {
+            Console.WriteLine("this is from ClassLibrary5.Class1");
+        }
     }
 }

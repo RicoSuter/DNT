@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using ClassLibrary10;
 
 namespace ConsoleApp1
 {
@@ -10,9 +8,11 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            // just try to use classes from packages
+            Console.WriteLine("Hello World from ConsoleApp1!");
 
-            //ClassLibrary3.Class1;
+  
+            Console.WriteLine("Press <Enter> to continue");
+            Console.ReadLine();
         }
     }
 }

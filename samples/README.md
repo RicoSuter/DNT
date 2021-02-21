@@ -4,8 +4,12 @@
 
 **These Solutions and Packages are used for testing.**
 
-## Usage
+The idea is to have a set of simple packages and solutions for testing dnt.
 
+Feel free to add more solutions with different frameworks or other styles of referencing NuGet packages.
+
+
+## Contents
 
 Directories
 
@@ -20,6 +24,7 @@ Directories
 All packages are simply standing alone.
 Except Pkg_1 depends on Pkg_3 and Pkg_4.
 
+All packages are at version 1.0.0 to simplify batches.
 
 ## How to build the packages
 
@@ -42,4 +47,12 @@ The packages are stored in a directory "repository".
 So there is no NuGet server (public or private) needed. 
 This directory has to be included into the Visual Studio configuration:  options / NuGet-Package-Manager / Package-Sources
 
+
+## Sample Solutions
+
+### Sln_1
+Simple c# Solution.
+.Net Framework
+
+References just one single NuGet Package with one single dll project.
 
