@@ -64,11 +64,13 @@ namespace Dnt.Commands.Packages
         {
             host.WriteMessage($"Loading projects ");
 
+            var globalProperties = TryGetGlobalProperties();
+
             foreach (var projectPath in GetProjectPaths())
             {
                 try
                 {
-                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath))
+                    using (var projectInformation = ProjectExtensions.LoadProject(projectPath, globalProperties))
                     {
                         foreach (var item in projectInformation.Project.Items.Where(i => i.ItemType == "PackageReference").ToList())
                         {

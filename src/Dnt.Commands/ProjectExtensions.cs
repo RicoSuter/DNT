@@ -31,11 +31,14 @@ namespace Dnt.Commands
             return (projectAbsolutePath.EndsWith(".csproj") || projectAbsolutePath.EndsWith(".vbproj"));
         }
 
-        public static ProjectInformation LoadProject(string projectPath)
+        public static ProjectInformation LoadProject(string projectPath, IDictionary<string, string> globalProperties = null)
         {
             // Based on https://daveaglick.com/posts/running-a-design-time-build-with-msbuild-apis
 
-            var globalProperties = GetGlobalProperties(projectPath);
+            if (globalProperties == null)
+            {
+                globalProperties = GetGlobalProperties(projectPath);
+            }
 
             var isSdkStyle = false;
 
@@ -60,9 +63,10 @@ namespace Dnt.Commands
             }
         }
 
-        private static Dictionary<string, string> GetGlobalProperties(string projectPath)
+        public static Dictionary<string, string> GetGlobalProperties(string projectOrSolutionPath)
         {
-            var solutionDir = Path.GetDirectoryName(projectPath);
+            // SolutionDir always ends with directory separator character
+            var solutionDir = $"{Path.GetDirectoryName(projectOrSolutionPath)}{Path.DirectorySeparatorChar}";
 
             return new Dictionary<string, string>
             {

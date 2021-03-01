@@ -11,15 +11,19 @@ using NConsole;
 
 namespace Dnt.Commands.Packages
 {
-    [Command(Name = "switch-to-projects")]
+    [Command(Name = "switch-to-projects", Description = "Switch NuGet references to project references")]
     public class SwitchPackagesToProjectsCommand : CommandBase
     {
-        [Argument(Position = 1)]
-        public string Configuration { get; set; }
+        [Argument(Position = 1, IsRequired = false, Description = "Configuration .json file")]
+        public string Configuration { get; set; } = "switcher.json";
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var configuration = ReferenceSwitcherConfiguration.Load(Configuration);
+            var configuration = ReferenceSwitcherConfiguration.Load(Configuration, host);
+            if (configuration == null)
+            {
+                return null;
+            }
 
             await AddProjectsToSolutionAsync(configuration, host);
             SwitchToProjects(configuration, host);
@@ -54,13 +58,15 @@ namespace Dnt.Commands.Packages
         private static void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
+            var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
+
             foreach (var solutionProject in solution.ProjectsInOrder)
             {
-                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder)
+                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder && solutionProject.ProjectType != SolutionProjectType.Unknown)
                 {
                     try
                     {
-                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath))
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath, globalProperties))
                         {
                             foreach (var mapping in configuration.Mappings)
                             {
