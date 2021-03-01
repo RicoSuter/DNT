@@ -1,7 +1,7 @@
 # DNT (DotNetTools)
 ## Command line tools to manage .NET Core, Standard and SDK-style projects and solutions
 
-[![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages?q=DNT)
+[![NuGet Version](https://img.shields.io/nuget/v/DNT.svg)](https://www.nuget.org/packages/DNT)
 [![npm](https://img.shields.io/npm/v/dotnettools.svg)](https://www.npmjs.com/package/dotnettools)
 
 **Command and parameter names may improve or change over time. Please create issues or PRs if you'd like to fix, change or add a command.**
