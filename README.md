@@ -187,6 +187,10 @@ dnt switch-to-projects switch-config.json
 
 Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
 
+**Optional `switcher.json` Flags:**
+
+- removeProjects: (Default: true) Removes mapped projects from the solution and ignores mapped projects when using switch-to-packages.
+
 ### switch-to-packages
 
 After implementing and testing, switch back to NuGet references and update to the latest version: 
