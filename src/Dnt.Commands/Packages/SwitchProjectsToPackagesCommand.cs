@@ -26,7 +26,11 @@ namespace Dnt.Commands.Packages
             }
 
             SwitchToPackages(host, configuration);
-            await RemoveProjectsFromSolutionAsync(configuration, host);
+
+            if (configuration.RemoveProjects)
+            {
+                await RemoveProjectsFromSolutionAsync(configuration, host);
+            }
 
             configuration.Restore = null; // restore information no longer needed
             configuration.Save();
@@ -114,7 +118,8 @@ namespace Dnt.Commands.Packages
             var projectFileName = Path.GetFileName(solutionProject.AbsolutePath);
             var projectDirectory = Path.GetDirectoryName(solutionProject.AbsolutePath);
 
-            if (!mappedProjectFilePaths.Contains(projectFileName)) // do not modify mapped projects
+            // do not modify mapped projects unless we are always keeping them in the solution
+            if (!mappedProjectFilePaths.Contains(projectFileName) || !configuration.RemoveProjects)
             {
                 var restoreProjectInformation = (
                     from r in configuration.Restore
