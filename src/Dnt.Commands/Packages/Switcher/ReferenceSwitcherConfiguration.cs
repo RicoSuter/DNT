@@ -24,6 +24,9 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonIgnore]
         public string ActualSolution => PathUtilities.ToAbsolutePath(Solution, System.IO.Path.GetDirectoryName(Path));
 
+        [JsonProperty("removeProjects", NullValueHandling = NullValueHandling.Ignore)]
+        public bool RemoveProjects { get; set; } = true;
+
         public string GetActualPath(string path)
         {
             return PathUtilities.ToAbsolutePath(path, System.IO.Path.GetDirectoryName(Path));
