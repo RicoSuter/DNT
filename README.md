@@ -157,9 +157,11 @@ This command supports .csproj, .vbproj, legacy and SDK-style projects (.NET Core
 
 #### Usage
 
-Create a `switcher.json` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file:
+Create a `switcher.json` file and specify the solution to look for projects, and the NuGet packages to replace with actual projects. The involved projects are only specified by the solution path in the settings file.
 
-**Sample:** Here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution: 
+The command supports switching to project references where the NuGet package is built from a single project or when it is built from multiple projects, i.e. the package contains multiple libraries.
+
+**Sample - single project per package:** Here we create a switcher file for [NSwag](http://nswag.org) which references libraries of [NJsonSchema](http://njsonschema.org) to work on both projects in a single solution: 
 
 ```json
 {
@@ -169,6 +171,26 @@ Create a `switcher.json` file and specify the solution to look for projects, and
     "NJsonSchema.CodeGeneration": "../../NJsonSchema/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj",
     "NJsonSchema.CodeGeneration.CSharp": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.CSharp/NJsonSchema.CodeGeneration.CSharp.csproj",
     "NJsonSchema.CodeGeneration.TypeScript": "../../NJsonSchema/src/NJsonSchema.CodeGeneration.TypeScript/NJsonSchema.CodeGeneration.TypeScript.csproj"
+  }
+}
+```
+
+**Sample - multiple projects per package:** Here we create a switcher file for a sample solution which references multiple libraries included (as dependencies) in the [UA-.NETStandard](https://github.com/OPCFoundation/UA-.NETStandard) [OPCFoundation.NetStandard.Opc.Ua](https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua/) package in order to work on all the projects in a single solution.
+
+```json
+{
+  "solution": "MyOpcUaApp.sln",
+  "mappings": {
+    "OPCFoundation.NetStandard.Opc.Ua": [
+      "../UA-.NETStandard/Stack/Opc.Ua.Core/Opc.Ua.Core.csproj",
+      "../UA-.NETStandard/Stack/Opc.Ua.Bindings.Https/Opc.Ua.Bindings.Https.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Security.Certificates/Opc.Ua.Security.Certificates.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Configuration/Opc.Ua.Configuration.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Client/Opc.Ua.Client.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Server/Opc.Ua.Server.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Gds.Client.Common/Opc.Ua.Gds.Client.Common.csproj",
+      "../UA-.NETStandard/Libraries/Opc.Ua.Gds.Server.Common/Opc.Ua.Gds.Server.Common.csproj",
+    ]
   }
 }
 ```
@@ -185,7 +207,7 @@ The command looks for `switcher.json` configuration file by default, but you can
 dnt switch-to-projects switch-config.json
 ```
 
-Now all NJsonSchema package references in the NSwag solution are replaced by local project references and the NJsonSchema projects are added to the solution.
+Now all NJsonSchema, or UA-.NETStandard, package references in the NSwag, or MyOpcUaApp, solution are replaced by local project references and the NJsonSchema, or UA-.NETStandard, projects are added to the solution.
 
 **Optional `switcher.json` Flags:**
 
@@ -198,6 +220,8 @@ After implementing and testing, switch back to NuGet references and update to th
 ```
 dnt switch-to-packages
 dnt update-packages NJsonSchema*
+# or
+dnt update-packages OPCFoundation.NetStandard.Opc.Ua.*
 ```
 
 ### used-packages
