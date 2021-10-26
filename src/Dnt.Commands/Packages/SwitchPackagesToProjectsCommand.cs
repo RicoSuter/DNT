@@ -98,6 +98,9 @@ namespace Dnt.Commands.Packages
             var project = projectInformation.Project;
             var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
 
+            var centralVersioning = project.GetProperty("CentralPackagesFile") != null   // https://github.com/microsoft/MSBuildSdks/tree/master/src/CentralPackageVersions
+                || project.GetPropertyValue("ManagePackageVersionsCentrally") == "true"; // https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
+            
             foreach (var item in project.Items
                 .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
             {
@@ -106,7 +109,7 @@ namespace Dnt.Commands.Packages
                 if (packageReference == packageName)
                 {
                     var isPackageReference = (item.ItemType == "PackageReference");
-                    var packageVersion =
+                    var packageVersion = centralVersioning ? null :
                         item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
 
                     project.RemoveItem(item);
