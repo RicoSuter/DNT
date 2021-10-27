@@ -55,7 +55,7 @@ namespace Dnt.Commands.Projects
                             projectInformation.Project.AddItem("ProjectReference", path, metaData);
                         }
 
-                        projectInformation.Project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
                 catch (Exception e)

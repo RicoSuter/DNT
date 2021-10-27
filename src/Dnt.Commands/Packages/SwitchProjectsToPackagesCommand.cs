@@ -148,7 +148,7 @@ namespace Dnt.Commands.Packages
 
                     if (count > 0)
                     {
-                        project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
             }

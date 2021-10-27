@@ -50,12 +50,15 @@ namespace Dnt.Commands
                 }
             }
 
+            var projectFileContent = File.ReadAllText(projectPath);
+            var lineEndings = projectFileContent.Contains("\r\n") ? "\r\n" : "\n";
+
             try
             {
                 var projectCollection = new ProjectCollection(globalProperties);
                 var project = projectCollection.LoadProject(projectPath);
 
-                return new ProjectInformation(projectCollection, project, !isSdkStyle);
+                return new ProjectInformation(projectCollection, project, !isSdkStyle, lineEndings);
             }
             catch (InvalidProjectFileException projectFileException)
             {
@@ -72,6 +75,16 @@ namespace Dnt.Commands
             {
                 { "SolutionDir", solutionDir }
             };
+        }
+
+        public static void SaveWithLineEndings(ProjectInformation projectInformation)
+        {
+            projectInformation.Project.Save();
+            if (projectInformation.LineEndings != Environment.NewLine)
+            {
+                var path = projectInformation.Project.FullPath;
+                File.WriteAllText(path, File.ReadAllText(path).Replace(Environment.NewLine, projectInformation.LineEndings));
+            }
         }
     }
 }

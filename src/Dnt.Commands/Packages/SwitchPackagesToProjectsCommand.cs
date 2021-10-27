@@ -126,7 +126,7 @@ namespace Dnt.Commands.Packages
                 }
             }
 
-            project.Save();
+            ProjectExtensions.SaveWithLineEndings(projectInformation);
 
             return switchedProjects;
         }
