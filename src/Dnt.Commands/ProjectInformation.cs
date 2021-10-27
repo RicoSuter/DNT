@@ -7,16 +7,19 @@ namespace Dnt.Commands
     {
         private readonly ProjectCollection _projectCollection;
 
-        public ProjectInformation(ProjectCollection projectCollection, Project project, bool isLegacyProject)
+        public ProjectInformation(ProjectCollection projectCollection, Project project, bool isLegacyProject, string lineEndings)
         {
             _projectCollection = projectCollection;
             Project = project;
             IsLegacyProject = isLegacyProject;
+            LineEndings = lineEndings;
         }
 
         public Project Project { get; }
 
         public bool IsLegacyProject { get; }
+
+        public string LineEndings { get; }
 
         public bool IsSdkProject => !IsLegacyProject;
 

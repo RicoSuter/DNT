@@ -86,7 +86,7 @@ namespace Dnt.Commands.Projects
                                 System.IO.Path.GetFileName(projectPath) + "\n");
                         }
 
-                        project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
                 catch (Exception e)
