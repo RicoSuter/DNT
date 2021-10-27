@@ -17,17 +17,19 @@ namespace Dnt.Commands.Packages.Switcher
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var token = JToken.Load(reader);
-            var result = new Dictionary<string, List<string>>();
 
-            switch (token.First.First.Type)
+            return token.Children<JProperty>().ToDictionary(val => val.Name, val =>
             {
-                case JTokenType.String:
-                    return token.Children<JProperty>().ToDictionary(val => val.Name, val => new List<string> { val.First.Value<string>() });
-                case JTokenType.Array:
-                    return token.ToObject<Dictionary<string, List<string>>>();
-                default:
-                    throw new InvalidCastException();
-            }
+                switch (val.Value.Type)
+                {
+                    case JTokenType.String:
+                        return new List<string> { val.Value.Value<string>() };
+                    case JTokenType.Array:
+                        return val.Value.ToObject<List<string>>();
+                    default:
+                        throw new InvalidCastException();
+                }
+            });
         }
 
         public override bool CanWrite
