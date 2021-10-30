@@ -37,6 +37,7 @@ namespace Dnt.Commands.Packages
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
+            var solutionFolderArg = "";
             foreach (var mapping in configuration.Mappings)
             {
                 foreach (var path in mapping.Value)
@@ -48,10 +49,12 @@ namespace Dnt.Commands.Packages
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
+                solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
             if (projects.Any())
             {
                 await ExecuteCommandAsync(
-                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects), host);
+                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects)+ solutionFolderArg, host);
             }
         }
 
