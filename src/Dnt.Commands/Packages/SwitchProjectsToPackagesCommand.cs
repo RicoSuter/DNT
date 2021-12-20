@@ -148,7 +148,7 @@ namespace Dnt.Commands.Packages
 
                     if (count > 0)
                     {
-                        project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
             }
@@ -179,6 +179,7 @@ namespace Dnt.Commands.Packages
                     if (!project.Items.Any(i => i.ItemType == "PackageReference" && i.EvaluatedInclude == packageName)) // check that the reference is not already present
                     {
                         var items = project.AddItem("PackageReference", packageName,
+                                                    packageVersion == null ? Enumerable.Empty<KeyValuePair<string, string>>() : // this is the case if CentralPackageVersions is in use
                             new[] { new KeyValuePair<string, string>("Version", packageVersion) });
 
                         items.ToList().ForEach(item =>
