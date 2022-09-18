@@ -42,7 +42,7 @@ namespace Dnt.Commands.Projects
                             }
                         }
 
-                        project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
                 catch (Exception e)

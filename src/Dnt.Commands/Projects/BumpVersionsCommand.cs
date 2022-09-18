@@ -37,7 +37,7 @@ namespace Dnt.Commands.Projects
 
                             if (!Simulate)
                             {
-                                projectInformation.Project.Save();
+                                ProjectExtensions.SaveWithLineEndings(projectInformation);
                             }
                         }
                         else
