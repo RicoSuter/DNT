@@ -32,6 +32,9 @@ namespace Dnt.Commands.Reflection
         [Argument(Position = 1, IsRequired = true)]
         public string Options { get; set; }
 
+        [Argument(Name = nameof(Configuration), IsRequired = false)]
+        public string Configuration { get; set; }
+
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var xmlDocsOptions = new XmlDocsOptions
@@ -40,7 +43,12 @@ namespace Dnt.Commands.Reflection
             };
 
             var directory = Path.GetDirectoryName(Path.GetFullPath(Options));
-            var options = JsonSerializer.Deserialize<ReflectMarkdownOptions>(File.ReadAllText(Options), new JsonSerializerOptions
+
+            var optionsJson = File
+                .ReadAllText(Options)
+                .Replace("$(Configuration)", Configuration);
+
+            var options = JsonSerializer.Deserialize<ReflectMarkdownOptions>(optionsJson, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
             });
