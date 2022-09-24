@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dnt.Commands.Infrastructure;
 using Fluid;
+using Fluid.Values;
 using Mono.Cecil;
 using Namotion.Reflection;
 using NConsole;
+using Newtonsoft.Json.Linq;
 
-namespace Dnt.Commands.Reflection
+namespace Dnt.Commands.Markdown
 {
-    [Command(Name = "assemblymark", Description = "TBD.")]
-    public class AssemblyMarkCommand : CommandBase
+    [Command(Name = "jsonmark", Description = "TBD.")]
+    public class JsonMarkCommand : CommandBase
     {
         public class ReflectMarkdownOptions
         {
-            public string AssemblyFile { get; set; }
-
-            public string TypeName { get; set; }
+            public string JsonFile { get; set; }
 
             public string MarkdownFile { get; set; }
 
@@ -30,7 +30,7 @@ namespace Dnt.Commands.Reflection
         }
 
         [Argument(Position = 1, IsRequired = true)]
-        public string Options { get; set; }
+        public string OptionsFile { get; set; }
 
         [Argument(Name = nameof(Configuration), IsRequired = false)]
         public string Configuration { get; set; }
@@ -42,10 +42,10 @@ namespace Dnt.Commands.Reflection
                 FormattingMode = XmlDocsFormattingMode.Markdown
             };
 
-            var directory = Path.GetDirectoryName(Path.GetFullPath(Options));
+            var directory = Path.GetDirectoryName(Path.GetFullPath(OptionsFile));
 
             var optionsJson = File
-                .ReadAllText(Options)
+                .ReadAllText(OptionsFile)
                 .Replace("$(Configuration)", Configuration);
 
             var options = JsonSerializer.Deserialize<ReflectMarkdownOptions>(optionsJson, new JsonSerializerOptions
@@ -53,23 +53,12 @@ namespace Dnt.Commands.Reflection
                 PropertyNameCaseInsensitive = true,
             });
 
-            options.AssemblyFile = PathUtilities.ToAbsolutePath(options.AssemblyFile, directory);
+            options.JsonFile = PathUtilities.ToAbsolutePath(options.JsonFile, directory);
             options.LiquidFile = PathUtilities.ToAbsolutePath(options.LiquidFile, directory);
             options.MarkdownFile = PathUtilities.ToAbsolutePath(options.MarkdownFile, directory);
 
-            XDocument xmlDocs = null;
-            var xmlDocsFile = options.AssemblyFile.Replace(".dll", ".xml");
-            if (File.Exists(xmlDocsFile))
-            {
-                xmlDocs = XDocument.Parse(File.ReadAllText(xmlDocsFile));
-            }
-
-            var assembly = AssemblyDefinition.ReadAssembly(options.AssemblyFile);
-            var type = assembly
-                .Modules
-                .SelectMany(m => m.Types)
-                .Where(t => t.FullName == options.TypeName)
-                .FirstOrDefault();
+            var jsonData = File.ReadAllText(options.JsonFile);
+            dynamic json = JObject.Parse(jsonData);
 
             var parser = new FluidParser();
             var source = File.ReadAllText(options.LiquidFile);
@@ -82,23 +71,22 @@ namespace Dnt.Commands.Reflection
                     CultureInfo = CultureInfo.InvariantCulture,
                 };
 
-                var context = new TemplateContext(new
+                templateOptions.Filters.AddFilter("properties", (FluidValue input, FilterArguments arguments, TemplateContext ctx) =>
                 {
-                    type.Name,
-                    type.FullName,
-                    type.Fields,
-                    type.Methods,
-                    Properties = type.Properties.Select(p => new
-                    {
-                        p.Name,
-                        p.PropertyType,
-                        p.CustomAttributes,
-                        Description = GetXmlDocsDescription(p, xmlDocsOptions, xmlDocs),
-                        DefaultValue = GetDefaultValue(p),
-                        IsRequired = GetIsRequired(p)
-                    })
-                }, templateOptions);
+                    var obj = input.ToObjectValue();
+                    if (obj is IFluidIndexable dictionary)
+                        return new ValueTask<FluidValue>(new ArrayValue(dictionary
+                            .Keys
+                            .Select(k => new ObjectValue(new
+                            {
+                                Name = k,
+                                Value = dictionary.TryGetValue(k, out var x) ? x : default
+                            }))));
+                    else
+                        return new ValueTask<FluidValue>(new ObjectValue(((JObject)obj).Properties()));
+                });
 
+                var context = new TemplateContext(json, templateOptions);
                 var output = template.Render(context);
 
                 var markdown = File.ReadAllText(options.MarkdownFile);

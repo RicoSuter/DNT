@@ -15,7 +15,7 @@ namespace Dnt
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -35,11 +35,14 @@ namespace Dnt
             catch (Exception e)
             {
                 ConsoleUtilities.WriteError(e.ToString());
+                return 1;
             }
-            ConsoleUtilities.WriteColor("\nElapsed time: " + stopwatch.Elapsed, ConsoleColor.DarkCyan);
+            finally
+            {
+                ConsoleUtilities.WriteColor("\nElapsed time: " + stopwatch.Elapsed, ConsoleColor.DarkCyan);
+            }
 
-            if (Debugger.IsAttached)
-                Console.ReadLine();
+            return 0;
         }
     }
 }

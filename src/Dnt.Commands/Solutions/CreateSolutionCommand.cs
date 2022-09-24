@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using NConsole;
@@ -47,25 +48,26 @@ namespace Dnt.Commands.Solutions
         {
             ConsoleUtilities.Write("Install templates? [yes|no]");
             if (Console.ReadLine() == "yes")
-                await ExecuteCommandAsync("dotnet", "new --install Microsoft.AspNetCore.SpaTemplates::*", host);
+                await ExecuteCommandAsync("dotnet", "new --install Microsoft.AspNetCore.SpaTemplates::*", 
+                    false, host, CancellationToken.None);
         }
 
         private async Task CreateApplicationProjectAsync(string appDirectory, IConsoleHost host)
         {
             Directory.SetCurrentDirectory(appDirectory);
 
-            await ExecuteCommandAsync("dotnet", "new " + Type, host);
-            await ExecuteCommandAsync("dotnet", "restore", host);
+            await ExecuteCommandAsync("dotnet", "new " + Type, false, host, CancellationToken.None);
+            await ExecuteCommandAsync("dotnet", "restore", false, host, CancellationToken.None);
 
             if (File.Exists("package.json"))
-                await ExecuteCommandAsync("npm", "i", host);
+                await ExecuteCommandAsync("npm", "i", false, host, CancellationToken.None);
         }
 
         private async Task CreateClientsProjectAsync(string clientsDirectory, IConsoleHost host)
         {
             Directory.SetCurrentDirectory(clientsDirectory);
-            await ExecuteCommandAsync("dotnet", "new classlib", host);
-            await ExecuteCommandAsync("dotnet", "restore", host);
+            await ExecuteCommandAsync("dotnet", "new classlib", false, host, CancellationToken.None);
+            await ExecuteCommandAsync("dotnet", "restore", false, host, CancellationToken.None);
         }
     }
 }

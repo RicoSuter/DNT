@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using NConsole;
 
@@ -17,15 +18,16 @@ namespace Dnt.Commands
 
         public abstract Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host);
 
-        protected async Task ExecuteCommandAsync(string command, string arguments, IConsoleHost host)
+        protected async Task<string> ExecuteCommandAsync(string command, string arguments, bool writeConsole, IConsoleHost host, CancellationToken cancellationToken)
         {
             if (Simulate)
             {
                 host.WriteMessage("SIMULATE " + command);
+                return string.Empty;
             }
             else
             {
-                await ProcessUtilities.ExecuteAsync(command, arguments, Verbose);
+                return await ProcessUtilities.ExecuteAsync(command, arguments, Verbose, writeConsole, cancellationToken);
             }
         }
     }
