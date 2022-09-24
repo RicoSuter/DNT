@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dnt.Commands.Infrastructure;
 using Fluid;
-using Fluid.Values;
 using Mono.Cecil;
 using Namotion.Reflection;
 using NConsole;
@@ -71,27 +70,15 @@ namespace Dnt.Commands.Markdown
                     CultureInfo = CultureInfo.InvariantCulture,
                 };
 
-                templateOptions.Filters.AddFilter("properties", (FluidValue input, FilterArguments arguments, TemplateContext ctx) =>
-                {
-                    var obj = input.ToObjectValue();
-                    if (obj is IFluidIndexable dictionary)
-                        return new ValueTask<FluidValue>(new ArrayValue(dictionary
-                            .Keys
-                            .Select(k => new ObjectValue(new
-                            {
-                                Name = k,
-                                Value = dictionary.TryGetValue(k, out var x) ? x : default
-                            }))));
-                    else
-                        return new ValueTask<FluidValue>(new ObjectValue(((JObject)obj).Properties()));
-                });
-
                 var context = new TemplateContext(json, templateOptions);
                 var output = template.Render(context);
 
                 var markdown = File.ReadAllText(options.MarkdownFile);
                 var firstIndex = markdown.IndexOf(options.Placeholder);
                 var secondIndex = markdown.IndexOf(options.Placeholder, firstIndex + 1);
+
+                // Hint: Looping through object gives indexers for key (property name) and value
+                // https://github.com/sebastienros/fluid/blob/main/Fluid/Values/DictionaryValue.cs#L126
 
                 markdown = markdown.Substring(0, firstIndex) +
                     options.Placeholder +
