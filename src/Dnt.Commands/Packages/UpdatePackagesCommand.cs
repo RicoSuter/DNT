@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
 using NConsole;
@@ -73,7 +74,7 @@ namespace Dnt.Commands.Packages
 
                     foreach (var package in packages)
                     {
-                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), host);
+                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package \"" + package + "\"" + (version != null ? " -v " + version : ""), false, host, CancellationToken.None);
                     }
                 }
             }

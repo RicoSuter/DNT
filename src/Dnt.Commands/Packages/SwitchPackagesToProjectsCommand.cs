@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
@@ -54,7 +55,8 @@ namespace Dnt.Commands.Packages
             if (projects.Any())
             {
                 await ExecuteCommandAsync(
-                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects)+ solutionFolderArg, host);
+                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects)+ solutionFolderArg, 
+                    false, host, CancellationToken.None);
             }
         }
 
