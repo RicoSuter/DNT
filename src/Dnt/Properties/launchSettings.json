@@ -3,7 +3,7 @@
     "Dnt": {
       "commandName": "Project",
       "commandLineArgs": "jsonmark GenerateOpenApiDocs.json",
-      "workingDirectory": "C:\\Data\\Buhler\\joint-forces\\backend\\modules\\identity\\src\\Identity.DevHost"
+      "workingDirectory": ""
     }
   }
 }
