@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NConsole;
 
@@ -39,7 +40,7 @@ namespace Dnt.Commands.Packages
                 {
                     try
                     {
-                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package " + Package + version, host);
+                        await ExecuteCommandAsync("dotnet", "add \"" + projectPath + "\" package " + Package + version, false, host, CancellationToken.None);
                     }
                     catch (Exception e)
                     {
