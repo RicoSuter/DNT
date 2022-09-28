@@ -25,7 +25,7 @@
     <PackageReference Include="Microsoft.Build" Version="16.4.0" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.4.0" />
     <PackageReference Include="NConsole" Version="3.12.6605.26941" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
   </ItemGroup>
 </Project>
