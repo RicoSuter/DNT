@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dnt.Commands.Infrastructure;
 using Fluid;
+using Microsoft.Extensions.FileProviders;
 using Mono.Cecil;
 using Namotion.Reflection;
 using NConsole;
@@ -80,24 +81,10 @@ namespace Dnt.Commands.Markdown
                 {
                     MemberAccessStrategy = new UnsafeMemberAccessStrategy(),
                     CultureInfo = CultureInfo.InvariantCulture,
+                    FileProvider = new PhysicalFileProvider(Path.GetDirectoryName(options.LiquidFile))
                 };
 
-                var context = new TemplateContext(new
-                {
-                    type.Name,
-                    type.FullName,
-                    type.Fields,
-                    type.Methods,
-                    Properties = type.Properties.Select(p => new
-                    {
-                        p.Name,
-                        p.PropertyType,
-                        p.CustomAttributes,
-                        Description = GetXmlDocsDescription(p, xmlDocsOptions, xmlDocs),
-                        DefaultValue = GetDefaultValue(p),
-                        IsRequired = GetIsRequired(p)
-                    })
-                }, templateOptions);
+                var context = new TemplateContext(GetTypeModel(type, xmlDocsOptions, xmlDocs), templateOptions);
 
                 var output = template.Render(context);
 
@@ -127,6 +114,44 @@ namespace Dnt.Commands.Markdown
             }
 
             return Task.FromResult<object>(null);
+        }
+
+        private object GetTypeModel(TypeDefinition type, XmlDocsOptions xmlDocsOptions, XDocument xmlDocs)
+        {
+            return new
+            {
+                type.Name,
+                type.FullName,
+                type.IsClass,
+
+                type.Methods,
+
+                Fields = type
+                    .Fields
+                    .Select(p => new
+                    {
+                        p.Name,
+                        PropertyType = GetTypeModel(p.FieldType.Resolve(), xmlDocsOptions, xmlDocs),
+                        p.CustomAttributes,
+                        Description = GetXmlDocsDescription(p, xmlDocsOptions, xmlDocs),
+                        DefaultValue = GetDefaultValue(p),
+
+                        IsRequired = GetIsRequired(p)
+                    }),
+
+                Properties = type
+                    .Properties
+                    .Select(p => new
+                    {
+                        p.Name,
+                        PropertyType = GetTypeModel(p.PropertyType.Resolve(), xmlDocsOptions, xmlDocs),
+                        p.CustomAttributes,
+                        Description = GetXmlDocsDescription(p, xmlDocsOptions, xmlDocs),
+                        DefaultValue = GetDefaultValue(p),
+
+                        IsRequired = GetIsRequired(p)
+                    })
+            };
         }
 
         private static object GetDefaultValue(IMemberDefinition memberDefinition)

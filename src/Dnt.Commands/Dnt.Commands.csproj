@@ -7,13 +7,14 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <PackageId>DNT.Commands</PackageId>
-    <Version>1.7.3</Version>
+    <Version>1.7.4</Version>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
     <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Fluid.Core" Version="2.2.15" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.29" />
     <PackageReference Include="Namotion.Reflection.Cecil" Version="2.1.1" />
     <PackageReference Include="NConsole" Version="3.12.6605.26941" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
