@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <AssemblyName>dnt</AssemblyName>
     <DevelopmentDependency>true</DevelopmentDependency>
@@ -10,11 +10,11 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.6.4</Version>
+    <Version>1.7.4</Version>
     <PackageId>DNT</PackageId>
     <DebugType>embedded</DebugType>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <PackAsTool>true</PackAsTool>
+	<ToolCommandName>dnt</ToolCommandName>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
     <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -33,6 +33,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net5.0'">
     <OutputPath>..\Dnt.Npm\bin\binaries\Net50</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net6.0'">
+    <OutputPath>..\Dnt.Npm\bin\binaries\Net60</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />

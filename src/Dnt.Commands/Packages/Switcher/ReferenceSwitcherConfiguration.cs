@@ -14,6 +14,9 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("solution")]
         public string Solution { get; set; }
 
+        [JsonProperty("solutionFolder")]
+        public string SolutionFolder { get; set; }
+
         [JsonProperty("mappings")]
         [JsonConverter(typeof(SingleOrArrayConverter))]
         public Dictionary<string, List<string>> Mappings { get; set; }

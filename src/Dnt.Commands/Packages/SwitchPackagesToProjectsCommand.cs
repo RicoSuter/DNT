@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
@@ -37,6 +38,7 @@ namespace Dnt.Commands.Packages
         {
             var solution = SolutionFile.Parse(configuration.ActualSolution);
             var projects = new List<string>();
+            var solutionFolderArg = "";
             foreach (var mapping in configuration.Mappings)
             {
                 foreach (var path in mapping.Value)
@@ -48,10 +50,13 @@ namespace Dnt.Commands.Packages
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
+                solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
             if (projects.Any())
             {
                 await ExecuteCommandAsync(
-                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects), host);
+                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects)+ solutionFolderArg, 
+                    false, host, CancellationToken.None);
             }
         }
 
@@ -98,6 +103,9 @@ namespace Dnt.Commands.Packages
             var project = projectInformation.Project;
             var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
 
+            var centralVersioning = project.GetProperty("CentralPackagesFile") != null   // https://github.com/microsoft/MSBuildSdks/tree/master/src/CentralPackageVersions
+                || project.GetPropertyValue("ManagePackageVersionsCentrally") == "true"; // https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
+            
             foreach (var item in project.Items
                 .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
             {
@@ -106,7 +114,7 @@ namespace Dnt.Commands.Packages
                 if (packageReference == packageName)
                 {
                     var isPackageReference = (item.ItemType == "PackageReference");
-                    var packageVersion =
+                    var packageVersion = centralVersioning ? null :
                         item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
 
                     project.RemoveItem(item);
@@ -123,7 +131,7 @@ namespace Dnt.Commands.Packages
                 }
             }
 
-            project.Save();
+            ProjectExtensions.SaveWithLineEndings(projectInformation);
 
             return switchedProjects;
         }

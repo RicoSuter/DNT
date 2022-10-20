@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
@@ -100,7 +101,7 @@ namespace Dnt.Commands.Packages
 
             if (projects.Any())
             {
-                await ExecuteCommandAsync("dotnet", "sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects), host);
+                await ExecuteCommandAsync("dotnet", "sln \"" + configuration.ActualSolution + "\" remove " + string.Join(" ", projects), false, host, CancellationToken.None);
             }
         }
 
@@ -148,7 +149,7 @@ namespace Dnt.Commands.Packages
 
                     if (count > 0)
                     {
-                        project.Save();
+                        ProjectExtensions.SaveWithLineEndings(projectInformation);
                     }
                 }
             }
@@ -179,6 +180,7 @@ namespace Dnt.Commands.Packages
                     if (!project.Items.Any(i => i.ItemType == "PackageReference" && i.EvaluatedInclude == packageName)) // check that the reference is not already present
                     {
                         var items = project.AddItem("PackageReference", packageName,
+                                                    packageVersion == null ? Enumerable.Empty<KeyValuePair<string, string>>() : // this is the case if CentralPackageVersions is in use
                             new[] { new KeyValuePair<string, string>("Version", packageVersion) });
 
                         items.ToList().ForEach(item =>
