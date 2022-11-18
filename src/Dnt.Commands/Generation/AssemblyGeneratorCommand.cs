@@ -12,10 +12,11 @@ using Mono.Cecil;
 using Namotion.Reflection;
 using NConsole;
 
-namespace Dnt.Commands.Markdown
+namespace Dnt.Commands.Generation
 {
-    [Command(Name = "assemblymark", Description = "TBD.")]
-    public class AssemblyMarkCommand : CommandBase
+    [Command(Name = "assemblygen", Description = "TBD.")]
+    public class AssemblyGeneratorCommand
+        : CommandBase
     {
         public class ReflectMarkdownOptions
         {
@@ -23,7 +24,7 @@ namespace Dnt.Commands.Markdown
 
             public string TypeName { get; set; }
 
-            public string MarkdownFile { get; set; }
+            public string OutputFile { get; set; }
 
             public string LiquidFile { get; set; }
 
@@ -56,7 +57,7 @@ namespace Dnt.Commands.Markdown
 
             options.AssemblyFile = PathUtilities.ToAbsolutePath(options.AssemblyFile, directory);
             options.LiquidFile = PathUtilities.ToAbsolutePath(options.LiquidFile, directory);
-            options.MarkdownFile = PathUtilities.ToAbsolutePath(options.MarkdownFile, directory);
+            options.OutputFile = PathUtilities.ToAbsolutePath(options.OutputFile, directory);
 
             XDocument xmlDocs = null;
             var xmlDocsFile = options.AssemblyFile.Replace(".dll", ".xml");
@@ -85,32 +86,34 @@ namespace Dnt.Commands.Markdown
                 };
 
                 var context = new TemplateContext(GetTypeModel(type, xmlDocsOptions, xmlDocs), templateOptions);
-
                 var output = template.Render(context);
 
-                var markdown = File.ReadAllText(options.MarkdownFile);
-                var firstIndex = markdown.IndexOf(options.Placeholder);
-                var secondIndex = markdown.IndexOf(options.Placeholder, firstIndex + 1);
-
-                markdown = markdown.Substring(0, firstIndex) +
-                    options.Placeholder +
-                    "\n" + output.Trim() +
-                    "\n" + options.Placeholder +
-                    markdown.Substring(secondIndex + options.Placeholder.Length);
-
-                if (string.IsNullOrWhiteSpace(options.MarkdownFile))
+                if (!string.IsNullOrEmpty(options.Placeholder))
                 {
-                    return Task.FromResult(markdown);
+                    var currentContent = File.ReadAllText(options.OutputFile);
+                    var firstIndex = currentContent.IndexOf(options.Placeholder);
+                    var secondIndex = currentContent.IndexOf(options.Placeholder, firstIndex + 1);
+
+                    output = currentContent.Substring(0, firstIndex) +
+                        options.Placeholder +
+                        "\n" + output.Trim() +
+                        "\n" + options.Placeholder +
+                        currentContent.Substring(secondIndex + options.Placeholder.Length);
+                }               
+
+                if (string.IsNullOrWhiteSpace(options.OutputFile))
+                {
+                    return Task.FromResult(output);
                 }
                 else
                 {
-                    File.WriteAllText(options.MarkdownFile, markdown);
-                    Console.WriteLine($"Updated {options.MarkdownFile} in {nameof(AssemblyMarkCommand)}.");
+                    File.WriteAllText(options.OutputFile, output);
+                    Console.WriteLine($"Updated {options.OutputFile} in {nameof(AssemblyGeneratorCommand)}.");
                 }
             }
             else
             {
-                Console.WriteLine($"Error in {nameof(AssemblyMarkCommand)}: {error}");
+                Console.WriteLine($"Error in {nameof(AssemblyGeneratorCommand)}: {error}");
             }
 
             return Task.FromResult<object>(null);
