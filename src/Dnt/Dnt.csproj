@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <AssemblyName>dnt</AssemblyName>
     <DevelopmentDependency>true</DevelopmentDependency>
@@ -36,6 +36,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net6.0'">
     <OutputPath>..\Dnt.Npm\bin\binaries\Net60</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net7.0'">
+    <OutputPath>..\Dnt.Npm\bin\binaries\Net70</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />
