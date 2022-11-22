@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
@@ -17,6 +18,8 @@ namespace Dnt.Commands.Generation
         public class ReflectMarkdownOptions
         {
             public string JsonFile { get; set; }
+
+            public string[] JsonFiles { get; set; }
 
             public string OutputFile { get; set; }
 
@@ -48,13 +51,20 @@ namespace Dnt.Commands.Generation
             {
                 PropertyNameCaseInsensitive = true,
             });
-
-            options.JsonFile = PathUtilities.ToAbsolutePath(options.JsonFile, directory);
+         
+            var jsonFiles = 
+                options.JsonFiles != null ? options.JsonFiles.Select(f => PathUtilities.ToAbsolutePath(f, directory)).ToArray() :
+                !string.IsNullOrEmpty(options.JsonFile) ? new[] { PathUtilities.ToAbsolutePath(options.JsonFile, directory) }  : null;
+            
             options.LiquidFile = PathUtilities.ToAbsolutePath(options.LiquidFile, directory);
             options.OutputFile = PathUtilities.ToAbsolutePath(options.OutputFile, directory);
 
-            var jsonData = File.ReadAllText(options.JsonFile);
-            dynamic json = JObject.Parse(jsonData);
+            var json = new JObject();
+            foreach (var jsonFile in jsonFiles)
+            {
+                var jsonData = File.ReadAllText(jsonFile);
+                json.Merge(JObject.Parse(jsonData));
+            }        
 
             var parser = new FluidParser();
             var source = File.ReadAllText(options.LiquidFile);
@@ -85,7 +95,7 @@ namespace Dnt.Commands.Generation
                         "\n" + options.Placeholder +
                         currentContent.Substring(secondIndex + options.Placeholder.Length);
                 }
-              
+
                 if (string.IsNullOrWhiteSpace(options.OutputFile))
                 {
                     return Task.FromResult(output);

@@ -2,7 +2,7 @@
 "use strict";
 
 var defaultCoreVersion = "Core31";
-var supportedCoreVersions = ["50", "60", "Core31", "Core30", "Core22", "Core21"];
+var supportedCoreVersions = ["60", "70", "Core31"];
 
 // Initialize
 process.title = 'dnt';
