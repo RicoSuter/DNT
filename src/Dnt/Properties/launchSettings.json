@@ -2,7 +2,7 @@
   "profiles": {
     "Dnt": {
       "commandName": "Project",
-      "commandLineArgs": "jsonmark GenerateOpenApiDocs.json",
+      "commandLineArgs": "",
       "workingDirectory": ""
     }
   }
