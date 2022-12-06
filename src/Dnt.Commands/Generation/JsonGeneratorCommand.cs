@@ -34,6 +34,9 @@ namespace Dnt.Commands.Generation
         [Argument(Name = nameof(Configuration), IsRequired = false)]
         public string Configuration { get; set; }
 
+        [Argument(Name = "Self", IsRequired = false)]
+        public bool AssignSelf { get; set; }
+
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var xmlDocsOptions = new XmlDocsOptions
@@ -64,7 +67,12 @@ namespace Dnt.Commands.Generation
             {
                 var jsonData = File.ReadAllText(jsonFile);
                 json.Merge(JObject.Parse(jsonData));
-            }        
+            }
+
+            if (AssignSelf)
+            {
+                json["self"] = json;
+            }
 
             var parser = new FluidParser();
             var source = File.ReadAllText(options.LiquidFile);
