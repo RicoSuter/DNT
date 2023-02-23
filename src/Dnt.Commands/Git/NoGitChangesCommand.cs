@@ -32,9 +32,11 @@ namespace Dnt.Commands.Git
                     host.WriteError("Change not allowed: " + change.Type + ": " + change.File + "\n");
                 }
 
-                throw new Exception("Changes in Git are not allowed \n" +
-                    "(e.g. build is not allowed to change the repository files, \n" +
-                    "rebuild the project locally and commit all changes).");
+                throw new Exception(
+                    "Changes in Git are not allowed (i.e. build is not allowed to change repository files).\n" +
+                    "Possible fixes:\n" +
+                    "- Merge target branch with the source branch (auto-merge changes files)\n" +
+                    "- Try to rebuild the project locally and commit all changes");
             }
 
             return changes.Length;
