@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
-using Microsoft.Build.Locator;
-using Microsoft.Build.Utilities;
+
+#nullable enable
 
 namespace Dnt.Commands
 {
     public static class ProjectExtensions
     {
+        public static string? GetVersion(this ProjectItem item)
+        {
+            return item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue;   
+        }
+        
         public static bool GeneratesPackage(this Project project)
         {
             return project.GetProperty("GeneratePackageOnBuild")?.EvaluatedValue.ToLowerInvariant() == "true";
@@ -31,7 +35,7 @@ namespace Dnt.Commands
             return (projectAbsolutePath.EndsWith(".csproj") || projectAbsolutePath.EndsWith(".vbproj"));
         }
 
-        public static ProjectInformation LoadProject(string projectPath, IDictionary<string, string> globalProperties = null)
+        public static ProjectInformation LoadProject(string projectPath, IDictionary<string, string>? globalProperties = null)
         {
             // Based on https://daveaglick.com/posts/running-a-design-time-build-with-msbuild-apis
 

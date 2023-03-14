@@ -1,5 +1,4 @@
-﻿using Microsoft.Build.Evaluation;
-using NConsole;
+﻿using NConsole;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
@@ -75,7 +74,7 @@ namespace Dnt.Commands.Packages
                         foreach (var item in projectInformation.Project.Items.Where(i => i.ItemType == "PackageReference").ToList())
                         {
                             var packageName = item.EvaluatedInclude;
-                            var packageVersion = item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? "Latest";
+                            var packageVersion = item.GetVersion() ?? GetCentralPackageVersion(projectInformation, packageName) ?? "Latest";
 
                             if (packageName != "NETStandard.Library" &&
                                 (!ExcludeSystem || !packageName.StartsWith("System.")) &&
@@ -106,6 +105,9 @@ namespace Dnt.Commands.Packages
             }
 
             host.WriteMessage($"\n");
+
+            string GetCentralPackageVersion(ProjectInformation projectInformation, string packageName)
+                => projectInformation.Project.Items.SingleOrDefault(i => i.ItemType == "PackageVersion" && i.EvaluatedInclude == packageName)?.GetVersion();
         }
 
         private async Task LoadAllDependenciesAsync(List<PackageReferenceInfo> packages, IConsoleHost host)
