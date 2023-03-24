@@ -10,20 +10,21 @@ namespace Dnt.Commands.Git
     [Command(Name = "nogitchanges")]
     public class NoGitChangesCommand : CommandBase
     {
-        private readonly Regex _regex = new Regex("\t(.*):  (.*)");
+        private readonly Regex _changedRegex = new Regex("\t((.*):  )?(.*)\n");
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var output = await ExecuteCommandAsync("git", "status", true, host, CancellationToken.None);
-            var matches = _regex.Matches(output);
-            var changes = matches
+          
+            var changesMatches = _changedRegex.Matches(output);
+            var changes = changesMatches
                 .OfType<Match>()
                 .Select(m => new
                 {
-                    Type = m.Groups[1].Value,
-                    File = m.Groups[2].Value
+                    Type = m.Groups[2].Value == "" ? "added" : m.Groups[2].Value,
+                    File = m.Groups[3].Value
                 })
-                .ToArray();
+                .ToArray();           
 
             if (changes.Any())
             {
