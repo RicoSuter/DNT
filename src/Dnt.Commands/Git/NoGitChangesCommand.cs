@@ -10,20 +10,21 @@ namespace Dnt.Commands.Git
     [Command(Name = "nogitchanges")]
     public class NoGitChangesCommand : CommandBase
     {
-        private readonly Regex _regex = new Regex("\t(.*):  (.*)");
+        private readonly Regex _changedRegex = new Regex("\t((.*):  )?(.*)\n");
 
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var output = await ExecuteCommandAsync("git", "status", true, host, CancellationToken.None);
-            var matches = _regex.Matches(output);
-            var changes = matches
+          
+            var changesMatches = _changedRegex.Matches(output);
+            var changes = changesMatches
                 .OfType<Match>()
                 .Select(m => new
                 {
-                    Type = m.Groups[1].Value,
-                    File = m.Groups[2].Value
+                    Type = m.Groups[2].Value == "" ? "added" : m.Groups[2].Value,
+                    File = m.Groups[3].Value
                 })
-                .ToArray();
+                .ToArray();           
 
             if (changes.Any())
             {
@@ -32,9 +33,11 @@ namespace Dnt.Commands.Git
                     host.WriteError("Change not allowed: " + change.Type + ": " + change.File + "\n");
                 }
 
-                throw new Exception("Changes in Git are not allowed \n" +
-                    "(e.g. build is not allowed to change the repository files, \n" +
-                    "rebuild the project locally and commit all changes).");
+                throw new Exception(
+                    "Changes in Git are not allowed (i.e. build is not allowed to change repository files).\n" +
+                    "Possible fixes:\n" +
+                    "- Merge target branch with the source branch (auto-merge changes files)\n" +
+                    "- Try to rebuild the project locally and commit all changes");
             }
 
             return changes.Length;
