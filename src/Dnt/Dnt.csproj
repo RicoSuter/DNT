@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <AssemblyName>dnt</AssemblyName>
     <DevelopmentDependency>true</DevelopmentDependency>
@@ -10,7 +10,7 @@
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <Product>DotNetTools (DNT)</Product>
-    <Version>1.8.3</Version>
+    <Version>1.9.0</Version>
     <PackageId>DNT</PackageId>
     <DebugType>embedded</DebugType>
     <PackAsTool>true</PackAsTool>
@@ -28,6 +28,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net7.0'">
     <OutputPath>..\Dnt.Npm\bin\binaries\Net70</OutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net8.0'">
+    <OutputPath>..\Dnt.Npm\bin\binaries\Net80</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />
   </ItemGroup>
@@ -36,12 +39,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="Microsoft.Build" Version="17.4.0" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.4.0" ExcludeAssets="runtime" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net7.0' and '$(TargetFramework)' != 'net8.0'">
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="Microsoft.Build" Version="16.7.0" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.7.0" ExcludeAssets="runtime" />

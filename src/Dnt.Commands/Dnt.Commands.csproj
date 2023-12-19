@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <RootNamespace>Dnt.Commands</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Product>DotNetTools (DNT)</Product>
     <Authors>Rico Suter</Authors>
     <Company>Rico Suter</Company>
     <PackageId>DNT.Commands</PackageId>
-    <Version>1.8.3</Version>
+    <Version>1.9.0</Version>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
     <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -22,12 +22,12 @@
     <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.2.0" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.5.5" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="Microsoft.Build" Version="17.4.0" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.4.0" ExcludeAssets="runtime" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net7.0' and '$(TargetFramework)' != 'net8.0'">
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="Microsoft.Build" Version="16.7.0" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.7.0" ExcludeAssets="runtime" />
