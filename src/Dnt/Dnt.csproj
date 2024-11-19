@@ -37,6 +37,7 @@
 	<ItemGroup>
 		<PackageReference Include="NConsole" Version="3.12.6605.26941" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 		<PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
 		<PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Build" Version="17.12.6" ExcludeAssets="runtime" />
