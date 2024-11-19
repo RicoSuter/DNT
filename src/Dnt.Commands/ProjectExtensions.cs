@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Xml;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
-using Microsoft.Build.Locator;
-using Microsoft.Build.Utilities;
 
 namespace Dnt.Commands
 {
