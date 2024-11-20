@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Dnt.Commands.Infrastructure;
 using NConsole;
@@ -17,7 +18,7 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("solutionFolder")]
         public string SolutionFolder { get; set; }
 
-        [JsonProperty("mappings")]
+        [JsonProperty("mappings", Required = Required.Always)]
         [JsonConverter(typeof(SingleOrArrayConverter))]
         public Dictionary<string, List<string>> Mappings { get; set; }
 
@@ -43,9 +44,16 @@ namespace Dnt.Commands.Packages.Switcher
                 return null;
             }
 
-            var c = JsonConvert.DeserializeObject<ReferenceSwitcherConfiguration>(File.ReadAllText(fileName));
-            c.Path = PathUtilities.ToAbsolutePath(fileName, Directory.GetCurrentDirectory());
-            return c;
+            try
+            {
+                var c = JsonConvert.DeserializeObject<ReferenceSwitcherConfiguration>(File.ReadAllText(fileName));
+                c.Path = PathUtilities.ToAbsolutePath(fileName, Directory.GetCurrentDirectory());
+                return c;
+            }
+            catch (JsonSerializationException e)
+            {
+                throw new ArgumentException(e.Message);
+            }
         }
 
         public void Save()
