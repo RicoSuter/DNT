@@ -12,6 +12,9 @@ namespace Dnt.Commands.Git
     {
         private readonly Regex _changedRegex = new Regex("\t((.*):  )?(.*)\n");
 
+        [Argument(Position = 1, IsRequired = false)]
+        public string ErrorText { get; set; }
+
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
             var output = await ExecuteCommandAsync("git", "status", true, host, CancellationToken.None);
@@ -28,6 +31,11 @@ namespace Dnt.Commands.Git
 
             if (changes.Any())
             {
+                if (!string.IsNullOrEmpty(ErrorText))
+                {
+                    host.WriteError(ErrorText + "\n\n");
+                }
+
                 foreach (var change in changes)
                 {
                     host.WriteError("Change not allowed: " + change.Type + ": " + change.File + "\n");
