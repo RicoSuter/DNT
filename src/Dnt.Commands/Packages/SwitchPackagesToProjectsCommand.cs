@@ -76,6 +76,7 @@ namespace Dnt.Commands.Packages
             catch (Exception ex)
             {
                 host.WriteError("Solution " + configuration.ActualSolution + " could not be loaded. " + ex.Message);
+                host.WriteError(ex.StackTrace);
             }
         }
 
@@ -92,8 +93,6 @@ namespace Dnt.Commands.Packages
             {
                 var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
                 var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
-
-                ProjectType pt = solution.ProjectTypes.First();
 
                 foreach (var solutionProject in solution.SolutionProjects)
                 {
