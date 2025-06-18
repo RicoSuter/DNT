@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
-using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.VisualStudio.SolutionPersistence.Model;
 using Microsoft.VisualStudio.SolutionPersistence.Serializer;
@@ -29,7 +28,7 @@ namespace Dnt.Commands.Packages
             }
 
             await AddProjectsToSolutionAsync(configuration, host);
-            await SwitchToProjects(configuration, host);
+            await SwitchToProjectsAsync(configuration, host);
 
             configuration.Save();
 
@@ -80,7 +79,7 @@ namespace Dnt.Commands.Packages
             }
         }
 
-        private static async Task SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
+        private static async Task SwitchToProjectsAsync(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
             var serializer = SolutionSerializers.GetSerializerByMoniker(configuration.ActualSolution);
             if (serializer is null)
@@ -167,107 +166,6 @@ namespace Dnt.Commands.Packages
             return switchedProjects;
         }
 
-        private async Task AddProjectsToSolutionAsyncLegacy(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
-        {
-            var solution = SolutionFile.Parse(configuration.ActualSolution);
-            var projects = new List<string>();
-            var solutionFolderArg = "";
-            foreach (var mapping in configuration.Mappings)
-            {
-                foreach (var path in mapping.Value)
-                {
-                    if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
-                    {
-                        projects.Add("\"" + configuration.GetActualPath(path) + "\"");
-                    }
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
-                solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
-            if (projects.Any())
-            {
-                await ExecuteCommandAsync(
-                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects) + solutionFolderArg,
-                    false, host, CancellationToken.None);
-            }
-        }
-
-        private static void SwitchToProjectsLegacy(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
-        {
-            var solution = SolutionFile.Parse(configuration.ActualSolution);
-            var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
-
-            foreach (var solutionProject in solution.ProjectsInOrder)
-            {
-                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder && solutionProject.ProjectType != SolutionProjectType.Unknown)
-                {
-                    try
-                    {
-                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath, globalProperties))
-                        {
-                            foreach (var mapping in configuration.Mappings)
-                            {
-                                var packageName = mapping.Key;
-                                var projectPaths = mapping.Value.Select(p => configuration.GetActualPath(p)).ToList();
-
-                                var switchedProjects = SwitchToProjectLegacy(configuration, solutionProject, projectInformation, packageName, projectPaths, host);
-                                foreach (var s in switchedProjects)
-                                {
-                                    host.WriteMessage("Project " + Path.GetFileName(s.Key) + " packages:\n");
-                                    host.WriteMessage("    " + packageName + " v" + s.Value + "\n    replaced by:\n");
-                                    projectPaths.ForEach(p => host.WriteMessage("    " + Path.GetFileName(p) + "\n"));
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        host.WriteError($"The project '{solutionProject.AbsolutePath}' could not be loaded: {e}\n");
-                    }
-                }
-            }
-        }
-
-        private static IReadOnlyDictionary<string, string> SwitchToProjectLegacy(ReferenceSwitcherConfiguration configuration,
-            ProjectInSolution solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, IConsoleHost host)
-        {
-            var switchedProjects = new Dictionary<string, string>();
-            var project = projectInformation.Project;
-            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
-
-            var centralVersioning = project.GetProperty("CentralPackagesFile") != null   // https://github.com/microsoft/MSBuildSdks/tree/master/src/CentralPackageVersions
-                || project.GetPropertyValue("ManagePackageVersionsCentrally") == "true"; // https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
-
-            foreach (var item in project.Items
-                .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
-            {
-                var packageReference = item.EvaluatedInclude.Split(',').First().Trim();
-
-                if (packageReference == packageName)
-                {
-                    var isPackageReference = (item.ItemType == "PackageReference");
-                    var packageVersion = centralVersioning ? null :
-                        item.Metadata.SingleOrDefault(m => m.Name == "Version")?.EvaluatedValue ?? null;
-
-                    project.RemoveItem(item);
-                    foreach (var projectPath in projectPaths)
-                    {
-                        project.AddItem("ProjectReference",
-                        PathUtilities.ToRelativePath(projectPath, projectDirectory));
-
-                        SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
-                            packageName, packageVersion);
-                    }
-
-                    switchedProjects[solutionProject.AbsolutePath] = packageVersion;
-                }
-            }
-
-            ProjectExtensions.SaveWithLineEndings(projectInformation);
-
-            return switchedProjects;
-        }
 
         private static void SetRestoreProjectInformation(ReferenceSwitcherConfiguration configuration, ProjectItem item,
             string projectFullPath, bool isPackageReference, string packageName, string packageVersion)
