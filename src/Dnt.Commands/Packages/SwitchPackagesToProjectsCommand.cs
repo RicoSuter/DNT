@@ -6,8 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
-using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
+using Microsoft.VisualStudio.SolutionPersistence.Model;
+using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 using NConsole;
 
 namespace Dnt.Commands.Packages
@@ -27,7 +28,7 @@ namespace Dnt.Commands.Packages
             }
 
             await AddProjectsToSolutionAsync(configuration, host);
-            SwitchToProjects(configuration, host);
+            await SwitchToProjectsAsync(configuration, host);
 
             configuration.Save();
 
@@ -36,42 +37,67 @@ namespace Dnt.Commands.Packages
 
         private async Task AddProjectsToSolutionAsync(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
-            var solution = SolutionFile.Parse(configuration.ActualSolution);
-            var projects = new List<string>();
-            var solutionFolderArg = "";
-            foreach (var mapping in configuration.Mappings)
+            var serializer = SolutionSerializers.GetSerializerByMoniker(configuration.ActualSolution);
+            if (serializer is null)
             {
-                foreach (var path in mapping.Value)
-                {
-                    if (solution.ProjectsInOrder.All(p => p.ProjectName != mapping.Key)) // check that it's not already in the solution
-                    {
-                        projects.Add("\"" + configuration.GetActualPath(path) + "\"");
-                    }
-                }
+                host.WriteError("Solution " + configuration.ActualSolution + " could not be loaded as it's not recognized by the serializer");
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
-                solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
-            if (projects.Any())
+            try
             {
-                await ExecuteCommandAsync(
-                    "dotnet", "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects)+ solutionFolderArg, 
-                    false, host, CancellationToken.None);
+                var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
+                var projects = new List<string>();
+                var solutionFolderArg = "";
+                foreach (var mapping in configuration.Mappings)
+                {
+                    foreach (var path in mapping.Value)
+                    {
+                        if (solution.SolutionProjects.All(p =>
+                                p.ActualDisplayName != mapping.Key)) // check that it's not already in the solution
+                        {
+                            projects.Add("\"" + configuration.GetActualPath(path) + "\"");
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
+                    solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
+                if (projects.Any())
+                {
+                    await ExecuteCommandAsync(
+                        "dotnet",
+                        "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects) +
+                        solutionFolderArg,
+                        false, host, CancellationToken.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                host.WriteError("Solution " + configuration.ActualSolution + " could not be loaded. " + ex.Message);
+                host.WriteError(ex.StackTrace);
             }
         }
 
-        private static void SwitchToProjects(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
+        private static async Task SwitchToProjectsAsync(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
         {
-            var solution = SolutionFile.Parse(configuration.ActualSolution);
-            var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
-
-            foreach (var solutionProject in solution.ProjectsInOrder)
+            var serializer = SolutionSerializers.GetSerializerByMoniker(configuration.ActualSolution);
+            if (serializer is null)
             {
-                if (solutionProject.ProjectType != SolutionProjectType.SolutionFolder && solutionProject.ProjectType != SolutionProjectType.Unknown)
+                host.WriteError("Solution " + configuration.ActualSolution + " could not be loaded as it's not recognized by the serializer");
+                return;
+            }
+
+            try
+            {
+                var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
+                var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
+
+                foreach (var solutionProject in solution.SolutionProjects)
                 {
                     try
                     {
-                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.AbsolutePath, globalProperties))
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.FilePath, globalProperties))
                         {
                             foreach (var mapping in configuration.Mappings)
                             {
@@ -90,22 +116,26 @@ namespace Dnt.Commands.Packages
                     }
                     catch (Exception e)
                     {
-                        host.WriteError($"The project '{solutionProject.AbsolutePath}' could not be loaded: {e}\n");
+                        host.WriteError($"The project '{solutionProject.FilePath}' could not be loaded: {e}\n");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                host.WriteError("Solution " + configuration.ActualSolution + " could not be loaded. " + ex.Message);
             }
         }
 
         private static IReadOnlyDictionary<string, string> SwitchToProject(ReferenceSwitcherConfiguration configuration,
-            ProjectInSolution solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, IConsoleHost host)
+            SolutionProjectModel solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, IConsoleHost host)
         {
             var switchedProjects = new Dictionary<string, string>();
             var project = projectInformation.Project;
-            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.AbsolutePath));
+            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.FilePath));
 
             var centralVersioning = project.GetProperty("CentralPackagesFile") != null   // https://github.com/microsoft/MSBuildSdks/tree/master/src/CentralPackageVersions
                 || project.GetPropertyValue("ManagePackageVersionsCentrally") == "true"; // https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
-            
+
             foreach (var item in project.Items
                 .Where(i => i.ItemType == "PackageReference" || i.ItemType == "Reference").ToList())
             {
@@ -127,7 +157,7 @@ namespace Dnt.Commands.Packages
                             packageName, packageVersion);
                     }
 
-                    switchedProjects[solutionProject.AbsolutePath] = packageVersion;
+                    switchedProjects[solutionProject.FilePath] = packageVersion;
                 }
             }
 
@@ -135,6 +165,7 @@ namespace Dnt.Commands.Packages
 
             return switchedProjects;
         }
+
 
         private static void SetRestoreProjectInformation(ReferenceSwitcherConfiguration configuration, ProjectItem item,
             string projectFullPath, bool isPackageReference, string packageName, string packageVersion)
