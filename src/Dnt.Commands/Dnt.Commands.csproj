@@ -24,6 +24,6 @@
 		<PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
 		<PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Build" Version="17.12.6" ExcludeAssets="runtime" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.50" ExcludeAssets="runtime" />
 	</ItemGroup>
 </Project>
