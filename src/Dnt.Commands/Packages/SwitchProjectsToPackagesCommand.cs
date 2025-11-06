@@ -204,7 +204,7 @@ namespace Dnt.Commands.Packages
             {
                 var reference = switchedProject.GetSwitchedPackage(packageName);
 
-                if (!string.IsNullOrEmpty(reference.Include))
+                if (reference != null && !string.IsNullOrEmpty(reference.Include))
                 {
                     project.AddItem("Reference", reference.Include, reference.Metadata);
                 }
