@@ -5,7 +5,7 @@
     <AssemblyName>dnt</AssemblyName>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Version>2.1.0</Version>
+    <Version>3.0.0</Version>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
     <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -22,11 +22,11 @@
     <ProjectReference Include="..\Dnt.Commands\Dnt.Commands.csproj" />
   </ItemGroup>
   <ItemGroup>
-	<PackageReference Include="Microsoft.Build" Version="17.12.6" />
-	<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
+	<PackageReference Include="Microsoft.Build" Version="18.0.2" ExcludeAssets="runtime" PrivateAssets="all" />
+	<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="NConsole" Version="3.12.6605.26941" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.1" />
+    <PackageReference Include="System.Text.Json" Version="10.0.1" />
   </ItemGroup>
 </Project>
