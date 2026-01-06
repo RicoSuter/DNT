@@ -1,29 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net472;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net472;net8.0;net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>Dnt.Commands</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Product>DotNetTools (DNT)</Product>
 		<Authors>Rico Suter</Authors>
 		<Company>Rico Suter</Company>
 		<PackageId>DNT.Commands</PackageId>
-		<Version>2.1.0</Version>
+		<Version>3.0.0</Version>
 		<Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
 		<PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
 		<PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Fluid.Core" Version="2.12.0" />
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.0" />
+		<PackageReference Include="Fluid.Core" Version="2.31.0" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.1" />
 		<PackageReference Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
-		<PackageReference Include="Namotion.Reflection.Cecil" Version="3.2.0" />
+		<PackageReference Include="Namotion.Reflection.Cecil" Version="3.4.3" />
 		<PackageReference Include="NConsole" Version="3.12.6605.26941" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="NuGet.Client" Version="4.2.0" />
 		<PackageReference Include="NuGet.Protocol.Core.v3" Version="4.2.0" />
-		<PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
-		<PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Build" Version="17.12.6" ExcludeAssets="runtime" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" ExcludeAssets="runtime" />
+		<PackageReference Include="NuGet.Frameworks" Version="4.2.0" ExcludeAssets="runtime" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Build.Locator" Version="1.11.2" />
+		<PackageReference Include="System.Collections.Immutable" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Build" Version="18.0.2" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" ExcludeAssets="runtime" />
 	</ItemGroup>
 </Project>
