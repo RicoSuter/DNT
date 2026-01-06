@@ -9,7 +9,7 @@
 ## Installation
 
 ### .NET Core global tool
-#### Requires .NET Core 2.2+ and Visual Studio 2019
+#### Requires .NET 8.0+ and Visual Studio 2019
 
 Install .NET Core global tool:
 
