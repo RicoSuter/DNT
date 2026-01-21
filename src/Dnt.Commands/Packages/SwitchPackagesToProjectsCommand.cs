@@ -131,7 +131,8 @@ namespace Dnt.Commands.Packages
         {
             var switchedProjects = new Dictionary<string, string>();
             var project = projectInformation.Project;
-            var projectDirectory = Path.GetFullPath(Path.GetDirectoryName(solutionProject.FilePath));
+            var solutionPath = Path.GetDirectoryName(solutionProject.FilePath);
+            var projectDirectory = string.IsNullOrEmpty(solutionPath) ? Path.GetDirectoryName(configuration.ActualSolution) : Path.GetDirectoryName(solutionPath);
 
             var centralVersioning = project.GetProperty("CentralPackagesFile") != null   // https://github.com/microsoft/MSBuildSdks/tree/master/src/CentralPackageVersions
                 || project.GetPropertyValue("ManagePackageVersionsCentrally") == "true"; // https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
