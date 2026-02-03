@@ -25,6 +25,9 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("restore", NullValueHandling = NullValueHandling.Ignore)]
         public List<RestoreProjectInformation> Restore { get; set; } = new List<RestoreProjectInformation>();
 
+        [JsonProperty("solutionProjectFolders", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, string> SolutionProjectFolders { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         [JsonIgnore]
         public string ActualSolution => PathUtilities.ToAbsolutePath(Solution, System.IO.Path.GetDirectoryName(Path));
 
@@ -34,6 +37,29 @@ namespace Dnt.Commands.Packages.Switcher
         public string GetActualPath(string path)
         {
             return PathUtilities.ToAbsolutePath(path, System.IO.Path.GetDirectoryName(Path));
+        }
+
+        public string GetSolutionFolderForProject(string projectPath)
+        {
+            if (SolutionProjectFolders == null || SolutionProjectFolders.Count == 0)
+            {
+                return null;
+            }
+
+            var absoluteProjectPath = System.IO.Path.GetFullPath(projectPath);
+            if (SolutionProjectFolders.TryGetValue(absoluteProjectPath, out var folder))
+            {
+                return folder;
+            }
+
+            var solutionDir = System.IO.Path.GetDirectoryName(ActualSolution);
+            var relativePath = PathUtilities.ToRelativePath(absoluteProjectPath, solutionDir);
+            if (SolutionProjectFolders.TryGetValue(relativePath, out folder))
+            {
+                return folder;
+            }
+
+            return null;
         }
 
         public static ReferenceSwitcherConfiguration Load(string fileName, IConsoleHost host)
