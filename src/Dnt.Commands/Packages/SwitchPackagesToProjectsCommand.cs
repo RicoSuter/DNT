@@ -47,8 +47,7 @@ namespace Dnt.Commands.Packages
             try
             {
                 var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
-                var projects = new List<string>();
-                var solutionFolderArg = "";
+                var projectsByFolder = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                 foreach (var mapping in configuration.Mappings)
                 {
                     foreach (var path in mapping.Value)
@@ -56,20 +55,35 @@ namespace Dnt.Commands.Packages
                         if (solution.SolutionProjects.All(p =>
                                 p.ActualDisplayName != mapping.Key)) // check that it's not already in the solution
                         {
-                            projects.Add("\"" + configuration.GetActualPath(path) + "\"");
+                            var actualPath = configuration.GetActualPath(path);
+                            var solutionFolder = configuration.GetSolutionFolderForProject(actualPath) ?? configuration.SolutionFolder;
+                            var folderKey = solutionFolder ?? string.Empty;
+                            if (!projectsByFolder.TryGetValue(folderKey, out var folderProjects))
+                            {
+                                folderProjects = new List<string>();
+                                projectsByFolder[folderKey] = folderProjects;
+                            }
+
+                            folderProjects.Add($"\"{actualPath}\"");
                         }
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(configuration.SolutionFolder))
-                    solutionFolderArg = $" --solution-folder {configuration.SolutionFolder}";
-                if (projects.Any())
+                foreach (var folderProjects in projectsByFolder)
                 {
-                    await ExecuteCommandAsync(
-                        "dotnet",
-                        "sln \"" + configuration.ActualSolution + "\" add " + string.Join(" ", projects) +
-                        solutionFolderArg,
-                        false, host, CancellationToken.None);
+                    var solutionFolderArg = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(folderProjects.Key))
+                    {
+                        solutionFolderArg = $" --solution-folder \"{folderProjects.Key}\"";
+                    }
+
+                    if (folderProjects.Value.Count > 0)
+                    {
+                        await ExecuteCommandAsync(
+                            "dotnet",
+                            $"sln \"{configuration.ActualSolution}\" add {string.Join(" ", folderProjects.Value)}{solutionFolderArg}",
+                            false, host, CancellationToken.None);
+                    }
                 }
             }
             catch (Exception ex)
