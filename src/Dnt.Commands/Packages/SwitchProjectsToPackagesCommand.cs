@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Dnt.Commands.Infrastructure;
 using Dnt.Commands.Packages.Switcher;
 using Microsoft.Build.Evaluation;
+using Microsoft.VisualStudio.SolutionPersistence.Model;
 using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 using NConsole;
-using Microsoft.VisualStudio.SolutionPersistence.Model;
 
 namespace Dnt.Commands.Packages
 {
@@ -58,39 +58,34 @@ namespace Dnt.Commands.Packages
                     .SelectMany(x => x)
                     .Select(p => Path.GetFileName(p))
                     .ToList();
-
-                foreach (var solutionProject in solution.SolutionProjects)
+                foreach (var solutionProject in solution.SolutionProjects.Where(solutionProject => ProjectExtensions.IsSupportedProject(solutionProject.FilePath)))
                 {
-                    if (ProjectExtensions.IsSupportedProject(solutionProject.FilePath))
+                    try
                     {
-                        try
+                        using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.FilePath, globalProperties))
                         {
-                            using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.FilePath, globalProperties))
+                            foreach (var mapping in configuration.Mappings)
                             {
-                                foreach (var mapping in configuration.Mappings)
+                                var projectPaths = mapping.Value.Select(p => configuration.GetActualPath(p)).ToList();
+                                var packageName = mapping.Key;
+
+                                var switchedProjects = SwitchToPackage(
+                                    configuration, solutionProject, projectInformation, projectPaths, packageName, mappedProjectFilePaths, host);
+
+                                if (switchedProjects.Count > 0)
                                 {
-                                    var projectPaths = mapping.Value.Select(p => configuration.GetActualPath(p)).ToList();
-                                    var packageName = mapping.Key;
-
-                                    var switchedProjects = SwitchToPackage(
-                                        configuration, solutionProject, projectInformation, projectPaths, packageName, mappedProjectFilePaths, host);
-
-                                    if (switchedProjects.Count > 0)
-                                    {
-                                        host.WriteMessage("Project " + solutionProject.ActualDisplayName + " with project references:\n");
-                                        projectPaths.ForEach(p => host.WriteMessage("    " + Path.GetFileName(p) + "\n"));
-                                        host.WriteMessage("    replaced by package: " + packageName + " v" + switchedProjects.First().PackageVersion + "\n");
-                                    }
+                                    host.WriteMessage("Project " + solutionProject.ActualDisplayName + " with project references:\n");
+                                    projectPaths.ForEach(p => host.WriteMessage("    " + Path.GetFileName(p) + "\n"));
+                                    host.WriteMessage("    replaced by package: " + packageName + " v" + switchedProjects.First().PackageVersion + "\n");
                                 }
                             }
                         }
-                        catch (Exception e)
-                        {
-                            host.WriteError($"The project '{solutionProject.FilePath}' could not be loaded: {e}\n");
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        host.WriteError($"The project '{solutionProject.FilePath}' could not be loaded: {e}\n");
                     }
                 }
-
             }
             catch (Exception ex)
             {

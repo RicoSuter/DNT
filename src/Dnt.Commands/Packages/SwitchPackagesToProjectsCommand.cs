@@ -92,8 +92,7 @@ namespace Dnt.Commands.Packages
             {
                 var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
                 var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
-
-                foreach (var solutionProject in solution.SolutionProjects)
+                foreach (var solutionProject in solution.SolutionProjects.Where(solutionProject => ProjectExtensions.IsSupportedProject(solutionProject.FilePath)))
                 {
                     try
                     {
