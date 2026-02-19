@@ -103,8 +103,12 @@ namespace Dnt.Commands.Packages
                             {
                                 var packageName = mapping.Key;
                                 var projectPaths = mapping.Value.Select(p => configuration.GetActualPath(p)).ToList();
+                                if (!configuration.AdditionalMetadata.TryGetValue(packageName, out var additionalMetadata))
+                                {
+                                    additionalMetadata = new List<string>();
+                                }
 
-                                var switchedProjects = SwitchToProject(configuration, solutionProject, projectInformation, packageName, projectPaths, host);
+                                var switchedProjects = SwitchToProject(configuration, solutionProject, projectInformation, packageName, projectPaths, additionalMetadata, host);
                                 foreach (var s in switchedProjects)
                                 {
                                     host.WriteMessage("Project " + Path.GetFileName(s.Key) + " packages:\n");
@@ -127,7 +131,7 @@ namespace Dnt.Commands.Packages
         }
 
         private static IReadOnlyDictionary<string, string> SwitchToProject(ReferenceSwitcherConfiguration configuration,
-            SolutionProjectModel solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, IConsoleHost host)
+            SolutionProjectModel solutionProject, ProjectInformation projectInformation, string packageName, List<string> projectPaths, List<string> additionalMetadata, IConsoleHost host)
         {
             var switchedProjects = new Dictionary<string, string>();
             var project = projectInformation.Project;
@@ -150,9 +154,20 @@ namespace Dnt.Commands.Packages
                     project.RemoveItem(item);
                     foreach (var projectPath in projectPaths)
                     {
-                        project.AddItem("ProjectReference",
-                        PathUtilities.ToRelativePath(projectPath, projectDirectory));
+                        var addedItems = project.AddItem("ProjectReference", PathUtilities.ToRelativePath(projectPath, projectDirectory));
 
+                        foreach (var addedItem in addedItems)
+                        {
+                            foreach (var metadata in additionalMetadata)
+                            {
+                                var parts = metadata.Split('=');
+                                if (parts.Length == 2)
+                                {
+                                    addedItem.SetMetadataValue(parts[0], parts[1]);
+                                }
+                            }
+                        }
+                        
                         SetRestoreProjectInformation(configuration, item, project.FullPath, isPackageReference,
                             packageName, packageVersion);
                     }
