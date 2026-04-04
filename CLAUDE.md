@@ -8,7 +8,7 @@ DNT (DotNetTools) is a .NET CLI tool for managing .NET Core, Standard, and SDK-s
 
 ## Git Rules
 
-- Never include "Claude" or "Co-Authored-By" lines in commit messages or git history.
+- Never include "Claude", "Co-Authored-By", or AI attribution in commit messages, PR descriptions, or GitHub comments.
 
 ## Build Commands
 
