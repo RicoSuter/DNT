@@ -125,7 +125,7 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [ build ]
+    needs: [ validate, build ]
     permissions:
       contents: read
       id-token: write
