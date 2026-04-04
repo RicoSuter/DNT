@@ -142,6 +142,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
       - name: Extract version from tag
         id: version
         run: |
