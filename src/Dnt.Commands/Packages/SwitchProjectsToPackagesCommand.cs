@@ -58,8 +58,14 @@ namespace Dnt.Commands.Packages
                     .SelectMany(x => x)
                     .Select(p => Path.GetFileName(p))
                     .ToList();
-                foreach (var solutionProject in solution.SolutionProjects.Where(solutionProject => ProjectExtensions.IsSupportedProject(solutionProject.FilePath)))
+                foreach (var solutionProject in solution.SolutionProjects)
                 {
+                    if (!ProjectExtensions.IsSupportedProject(solutionProject.FilePath))
+                    {
+                        ConsoleUtilities.Write("Skipping unsupported project: " + solutionProject.FilePath + "\n");
+                        continue;
+                    }
+
                     try
                     {
                         using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.FilePath, globalProperties))
