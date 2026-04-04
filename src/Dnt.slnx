@@ -1,0 +1,21 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Dnt.Npm/">
+    <File Path="Dnt.Npm/package.json" />
+    <File Path="Dnt.Npm/README.md" />
+  </Folder>
+  <Folder Name="/Dnt.Npm/bin/">
+    <File Path="Dnt.Npm/bin/dnt.js" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../README.md" />
+  </Folder>
+  <Project Path="Dnt.Commands/Dnt.Commands.csproj" />
+  <Project Path="Dnt.NetFx/Dnt.NetFx.csproj" />
+  <Project Path="Dnt.Tests/Dnt.Tests.csproj" />
+  <Project Path="Dnt/Dnt.csproj" />
+</Solution>
