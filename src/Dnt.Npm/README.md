@@ -1,3 +1,3 @@
 Dnt.Npm
 
-https://github.com/RSuter/DNT
+https://github.com/RicoSuter/DNT

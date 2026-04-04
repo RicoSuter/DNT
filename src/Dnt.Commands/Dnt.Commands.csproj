@@ -8,7 +8,7 @@
 		<Company>Rico Suter</Company>
 		<PackageId>DNT.Commands</PackageId>
 		<Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
-		<PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/RicoSuter/DNT</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/RicoSuter/DNT</RepositoryUrl>
 		<PackageTags>dotnet;tools;nuget;projects;solutions</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

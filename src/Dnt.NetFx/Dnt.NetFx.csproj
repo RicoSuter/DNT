@@ -7,7 +7,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
-    <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/RicoSuter/DNT</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
