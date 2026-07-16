@@ -31,6 +31,9 @@ namespace Dnt.Commands.Packages.Switcher
         [JsonProperty("removeProjects", NullValueHandling = NullValueHandling.Ignore)]
         public bool RemoveProjects { get; set; } = true;
 
+        [JsonProperty("additionalMetadata", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, List<string>> AdditionalMetadata { get; set; } = new Dictionary<string, List<string>>();
+
         public string GetActualPath(string path)
         {
             return PathUtilities.ToAbsolutePath(path, System.IO.Path.GetDirectoryName(Path));
