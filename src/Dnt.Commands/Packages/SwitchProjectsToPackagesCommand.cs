@@ -14,18 +14,17 @@ using NConsole;
 namespace Dnt.Commands.Packages
 {
     [Command(Name = "switch-to-packages", Description = "Switch project references to NuGet references")]
-    public class SwitchProjectsToPackagesCommand : CommandBase
+    public class SwitchProjectsToPackagesCommand : SwitchCommandBase
     {
-        [Argument(Position = 1, IsRequired = false, Description = "Configuration .json file")]
-        public string Configuration { get; set; } = "switcher.json";
-
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var configuration = ReferenceSwitcherConfiguration.Load(Configuration, host);
+            var configuration = LoadConfiguration(host);
             if (configuration == null)
             {
                 return null;
             }
+
+            ReconcileRestoreVariables(configuration, host);
 
             await SwitchToPackagesAsync(host, configuration);
 
@@ -35,9 +34,48 @@ namespace Dnt.Commands.Packages
             }
 
             configuration.Restore = null; // restore information no longer needed
+            configuration.RestoreVariables = null; // transient switch snapshot no longer needed
             configuration.Save();
 
             return null;
+        }
+
+        /// <summary>If switch-to-projects recorded a different set of variables than the current run resolves,
+        /// warns and re-applies the recorded snapshot so references restore against the paths that were written.</summary>
+        private static void ReconcileRestoreVariables(ReferenceSwitcherConfiguration configuration, IConsoleHost host)
+        {
+            var recorded = configuration.RestoreVariables;
+            if (recorded == null || recorded.Count == 0)
+            {
+                return;
+            }
+
+            var current = configuration.EffectiveVariables ?? new Dictionary<string, string>();
+            var differing = new List<string>();
+            foreach (var entry in recorded)
+            {
+                current.TryGetValue(entry.Key, out var currentValue);
+                if (!string.Equals(currentValue, entry.Value, StringComparison.Ordinal))
+                {
+                    differing.Add(entry.Key);
+                }
+            }
+
+            if (differing.Count == 0)
+            {
+                return;
+            }
+
+            host.WriteMessage("Warning: switch-to-packages is running with different switcher variables than switch-to-projects used.\n");
+            foreach (var key in differing)
+            {
+                recorded.TryGetValue(key, out var recordedValue);
+                current.TryGetValue(key, out var currentValue);
+                host.WriteMessage($"    {key}: switched in with '{recordedValue}', now '{currentValue ?? "(unset)"}'. Using '{recordedValue}' to restore.\n");
+            }
+
+            // Re-apply the recorded snapshot so reference matching targets exactly what switch-to-projects wrote.
+            configuration.ApplyVariableOverrides(recorded);
         }
 
         private static async Task SwitchToPackagesAsync(IConsoleHost host, ReferenceSwitcherConfiguration configuration)
@@ -56,7 +94,7 @@ namespace Dnt.Commands.Packages
                 var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
                 var mappedProjectFilePaths = configuration.Mappings.Values
                     .SelectMany(x => x)
-                    .Select(p => Path.GetFileName(p))
+                    .Select(p => Path.GetFileName(configuration.GetActualPath(p)))
                     .ToList();
                 foreach (var solutionProject in solution.SolutionProjects)
                 {

@@ -213,6 +213,59 @@ Now all NJsonSchema, or UA-.NETStandard, package references in the NSwag, or MyO
 
 - removeProjects: (Default: true) Removes mapped projects from the solution and ignores mapped projects when using switch-to-packages.
 
+#### Path variables and git worktrees
+
+Instead of hard-coding the full relative path in every mapping, you can define a `variables` block once and reference it from mappings with MSBuild-style `$(name)` tokens. Changing one variable re-points every mapping — handy when the referenced libraries live in a shared parent folder you want to swap out, for example a different git worktree of the library:
+
+```json
+{
+  "solution": "NSwag.sln",
+  "variables": {
+    "NJsonSchema": "../../NJsonSchema"
+  },
+  "mappings": {
+    "NJsonSchema": "$(NJsonSchema)/src/NJsonSchema/NJsonSchema.csproj",
+    "NJsonSchema.CodeGeneration": "$(NJsonSchema)/src/NJsonSchema.CodeGeneration/NJsonSchema.CodeGeneration.csproj"
+  }
+}
+```
+
+Variables may reference other variables (e.g. `"root": "../.."`, `"NJsonSchema": "$(root)/NJsonSchema"`) and may be used in `solution` as well. Tokens must appear only in the directory portions of a path, not the file name. An undefined `$(name)` is an error.
+
+##### Overriding variables without editing the committed file
+
+When working with git worktrees you usually want to point the switcher at a *different* checkout of a library without editing (and risking committing) the shared `switcher.json`. Variable values can be overridden from several layers, applied in increasing order of precedence:
+
+1. Committed `variables` in `switcher.json` (the defaults).
+2. A local override file `switcher.local.json` next to the config (or a path passed with `/profile:`). Add `*.local.json` to `.gitignore` so it stays out of version control. It only needs a `variables` block:
+
+   ```json
+   { "variables": { "NJsonSchema": "../../NJsonSchema-featureX" } }
+   ```
+
+3. Environment variables named `DNT_SWITCHER_VAR_<NAME>`, e.g. `DNT_SWITCHER_VAR_NJSONSCHEMA=../../NJsonSchema-featureX`.
+4. The `/variables:` command-line option (highest precedence), a semicolon-delimited list — quote the whole value. Because the configuration file is a positional argument, specify it explicitly on the command line when using `/variables:`:
+
+   ```
+   dnt switch-to-projects switcher.json /variables:"NJsonSchema=../../NJsonSchema-featureX"
+   ```
+
+Run with `--verbose` (or whenever an override is active) to print the effective variables and where each one came from. Overrides never modify your committed `variables` block. When an override is active, `switch-to-projects` records the effective values in a transient `restoreVariables` section so `switch-to-packages` can restore against the same paths; `switch-to-packages` removes that section again (see below). With no override active, nothing is written back. For a hands-free, per-worktree setup the local `switcher.local.json` file is usually the most convenient layer.
+
+A typical worktree workflow:
+
+```
+# in the library repo, create a worktree for the branch you want to develop against
+git worktree add ../NJsonSchema-featureX featureX
+
+# in the consuming repo, point the switcher at that worktree (no committed change)
+dnt switch-to-projects switcher.json /variables:"NJsonSchema=../../NJsonSchema-featureX"
+# ... work across both repos in one solution ...
+dnt switch-to-packages
+```
+
+`switch-to-projects` records the variable values it used, so `switch-to-packages` restores the same references even if you forget to pass the same override — it warns when the current values differ and uses the recorded ones.
+
 ### switch-to-packages
 
 After implementing and testing, switch back to NuGet references and update to the latest version: 
