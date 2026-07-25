@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 /Dnt/Properties/launchSettings.json
+
+# DNT reference-switcher local overrides (developer worktree targets)
+*.local.json

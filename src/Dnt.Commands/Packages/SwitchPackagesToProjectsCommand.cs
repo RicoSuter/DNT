@@ -14,14 +14,11 @@ using NConsole;
 namespace Dnt.Commands.Packages
 {
     [Command(Name = "switch-to-projects", Description = "Switch NuGet references to project references")]
-    public class SwitchPackagesToProjectsCommand : CommandBase
+    public class SwitchPackagesToProjectsCommand : SwitchCommandBase
     {
-        [Argument(Position = 1, IsRequired = false, Description = "Configuration .json file")]
-        public string Configuration { get; set; } = "switcher.json";
-
         public override async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         {
-            var configuration = ReferenceSwitcherConfiguration.Load(Configuration, host);
+            var configuration = LoadConfiguration(host);
             if (configuration == null)
             {
                 return null;
@@ -29,6 +26,9 @@ namespace Dnt.Commands.Packages
 
             await AddProjectsToSolutionAsync(configuration, host);
             await SwitchToProjectsAsync(configuration, host);
+
+            // Record the effective variables used so switch-to-packages can restore the exact same references.
+            configuration.RestoreVariables = SnapshotEffectiveVariables(configuration);
 
             configuration.Save();
 
