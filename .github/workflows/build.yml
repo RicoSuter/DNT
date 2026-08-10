@@ -1,0 +1,155 @@
+name: publish
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - '*'
+  release:
+    types:
+      - published
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  DOTNET_VERSION: 10.0.x
+  NUGET_DIRECTORY: ${{ github.workspace }}/nuget
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        run: dotnet build src/Dnt.slnx --configuration Release
+
+      - name: Run tests
+        run: dotnet test src/Dnt.slnx --configuration Release --no-build
+
+      - name: Upload NPM binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-binaries
+          if-no-files-found: error
+          retention-days: 7
+          path: src/Dnt.Npm/bin/binaries/
+
+  pack:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [ build ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          $version = "${{ github.event.release.tag_name }}" -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Pack
+        run: dotnet pack src/Dnt.slnx --configuration Release --output ${{ env.NUGET_DIRECTORY }} -p:PackageVersion=${{ steps.version.outputs.VERSION }}
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 7
+          path: ${{ env.NUGET_DIRECTORY }}/*.nupkg
+
+  validate:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [ pack ]
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: nuget
+          path: ${{ env.NUGET_DIRECTORY }}
+
+      - name: Install nuget validator
+        run: dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global --version 1.0.46
+
+      - name: Validate package
+        run: meziantou.validate-nuget-package --excluded-rules IconMustBeSet,ReadmeMustBeSet,Symbols,ProjectUrlMustBeSet (Get-ChildItem "${{ env.NUGET_DIRECTORY }}/*.nupkg")
+
+  deploy-nuget:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [ validate, build ]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nuget
+          path: ${{ env.NUGET_DIRECTORY }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish NuGet package
+        run: |
+          foreach($file in (Get-ChildItem "${{ env.NUGET_DIRECTORY }}" -Recurse -Include *.nupkg)) {
+              dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
+
+  deploy-npm:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [ validate, build ]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-binaries
+          path: src/Dnt.Npm/bin/binaries/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          $version = "${{ github.event.release.tag_name }}" -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Set version and publish
+        working-directory: src/Dnt.Npm
+        run: |
+          npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
+          npm publish --provenance

@@ -92,9 +92,14 @@ namespace Dnt.Commands.Packages
             {
                 var solution = await serializer.OpenAsync(configuration.ActualSolution, CancellationToken.None);
                 var globalProperties = ProjectExtensions.GetGlobalProperties(Path.GetFullPath(configuration.ActualSolution));
-
                 foreach (var solutionProject in solution.SolutionProjects)
                 {
+                    if (!ProjectExtensions.IsSupportedProject(solutionProject.FilePath))
+                    {
+                        ConsoleUtilities.Write("Skipping unsupported project: " + solutionProject.FilePath + "\n");
+                        continue;
+                    }
+
                     try
                     {
                         using (var projectInformation = ProjectExtensions.LoadProject(solutionProject.FilePath, globalProperties))

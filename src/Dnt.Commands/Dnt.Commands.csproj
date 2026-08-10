@@ -2,15 +2,18 @@
 	<PropertyGroup>
 		<TargetFrameworks>net472;net8.0;net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>Dnt.Commands</RootNamespace>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
 		<Product>DotNetTools (DNT)</Product>
 		<Authors>Rico Suter</Authors>
 		<Company>Rico Suter</Company>
 		<PackageId>DNT.Commands</PackageId>
-		<Version>3.0.0</Version>
 		<Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
-		<PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
-		<PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/RicoSuter/DNT</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/RicoSuter/DNT</RepositoryUrl>
+		<PackageTags>dotnet;tools;nuget;projects;solutions</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Fluid.Core" Version="2.31.0" />

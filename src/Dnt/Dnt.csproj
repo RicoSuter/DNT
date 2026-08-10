@@ -6,18 +6,18 @@
 		<AssemblyName>dnt</AssemblyName>
 		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Rico Suter</Authors>
 		<Company>Rico Suter</Company>
 		<Product>DotNetTools (DNT)</Product>
-		<Version>3.0.0</Version>
 		<PackageId>DNT</PackageId>
 		<DebugType>embedded</DebugType>
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>dnt</ToolCommandName>
 		<Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
-		<PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
-		<PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/RicoSuter/DNT</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/RicoSuter/DNT</RepositoryUrl>
+		<PackageTags>dotnet;tools;nuget;projects;solutions</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net8.0'">
 		<OutputPath>..\Dnt.Npm\bin\binaries\Net80</OutputPath>

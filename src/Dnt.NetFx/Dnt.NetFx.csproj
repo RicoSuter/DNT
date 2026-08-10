@@ -5,10 +5,10 @@
     <AssemblyName>dnt</AssemblyName>
     <DebugType>embedded</DebugType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Version>3.0.0</Version>
+    <IsPackable>false</IsPackable>
     <Description>Command line tools to manage .NET Core, Standard and SDK-style projects and solutions.</Description>
-    <PackageProjectUrl>https://github.com/RSuter/DNT</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/RSuter/DNT/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/RicoSuter/DNT</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Dnt\*.cs">
